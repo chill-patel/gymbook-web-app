@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   Divider,
+  IconButton,
   List,
   ListItemButton,
   ListItemIcon,
@@ -24,6 +25,7 @@ import {
   ChevronRight as ChevronIcon,
   Edit as EditIcon,
   BugReport as ReportIcon,
+  AccountBalanceWallet as WalletIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { useAuth } from '@/context/AuthContext';
@@ -35,6 +37,52 @@ interface MenuItem {
   path?: string;
   value?: string | number;
   disabled?: boolean;
+}
+
+function SubscriptionCard({ subscriptionExp, isTrial }: { subscriptionExp?: string; isTrial?: boolean }) {
+  if (!subscriptionExp) return null;
+
+  const expDate = new Date(subscriptionExp);
+  const now = new Date();
+  const diffMs = expDate.getTime() - now.getTime();
+  const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  const isExpired = daysLeft <= 0;
+  const statusText = isExpired
+    ? 'Expired'
+    : daysLeft === 1
+      ? 'Expires today'
+      : `Expires in ${daysLeft} days`;
+
+  const statusColor = isExpired
+    ? Colors.status.expired
+    : daysLeft <= 3
+      ? Colors.status.expiring
+      : Colors.status.active;
+
+  return (
+    <Card
+      sx={{
+        mb: 2,
+        borderLeft: `4px solid ${statusColor}`,
+      }}
+    >
+      <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1.5, '&:last-child': { pb: 1.5 } }}>
+        <Avatar sx={{ bgcolor: `${statusColor}1A`, color: statusColor, width: 40, height: 40 }}>
+          <WalletIcon fontSize="small" />
+        </Avatar>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="body1" fontWeight={600} color={statusColor}>
+            {statusText}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {isTrial ? 'Trial' : 'Subscription'} · {expDate.toLocaleDateString()}
+          </Typography>
+        </Box>
+        <ChevronIcon sx={{ color: 'text.secondary' }} />
+      </CardContent>
+    </Card>
+  );
 }
 
 function MenuSection({ title, items }: { title: string; items: MenuItem[] }) {
@@ -92,20 +140,17 @@ export default function GymPage() {
       icon: <PtPlanIcon />,
       path: '/gym/pt-plans',
       value: gym?.totalPtPlan ?? 0,
-      disabled: true,
     },
     {
       label: 'Gym Services',
       icon: <ServicesIcon />,
       path: '/gym/services',
       value: gym?.totalService ?? 0,
-      disabled: true,
     },
     {
       label: 'Batches',
       icon: <BatchIcon />,
       path: '/gym/batches',
-      disabled: true,
     },
   ];
 
@@ -160,12 +205,12 @@ export default function GymPage() {
 
   return (
     <Box>
-      {/* Gym Header / Profile Card */}
+      {/* Gym Header — mirrors mobile GymHeader */}
       <Card sx={{ mb: 2 }}>
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Avatar
-              src={gym?.logo}
+              src={gym?.subLogo}
               sx={{
                 width: 72,
                 height: 72,
@@ -173,30 +218,39 @@ export default function GymPage() {
                 fontSize: 28,
               }}
             >
-              {(gym?.gymName ?? gym?.subName ?? 'G').charAt(0).toUpperCase()}
+              {(gym?.subName ?? 'G').charAt(0).toUpperCase()}
             </Avatar>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography variant="h6" fontWeight={700} noWrap>
-                {gym?.gymName ?? gym?.subName}
+                {gym?.subName}
+              </Typography>
+              <Typography variant="body1" color="text.secondary" noWrap>
+                {gym?.admin?.name}
               </Typography>
               <Typography variant="body2" color="text.secondary" noWrap>
-                {gym?.name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" noWrap>
-                {gym?.email}
+                {gym?.admin?.email}
               </Typography>
               {gym?.mobile && (
                 <Typography variant="body2" color="text.secondary" noWrap>
-                  +{gym.callingCode ?? ''} {gym.mobile}
+                  {gym.callingCode ? `+${gym.callingCode}` : ''} {gym.mobile}
                 </Typography>
               )}
             </Box>
-            <Box>
-              <EditIcon sx={{ color: 'text.secondary', cursor: 'pointer' }} />
-            </Box>
+            <IconButton
+              size="small"
+              sx={{ color: Colors.primary }}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
           </Box>
         </CardContent>
       </Card>
+
+      {/* Subscription Card */}
+      <SubscriptionCard
+        subscriptionExp={gym?.subscriptionExp}
+        isTrial={gym?.isTrialSubscription}
+      />
 
       {/* Menu Sections */}
       <MenuSection title="Manage Plans" items={managePlans} />

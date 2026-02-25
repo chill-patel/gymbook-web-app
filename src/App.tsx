@@ -11,6 +11,9 @@ import MemberListPage from '@/pages/members/MemberListPage';
 import MemberDetailPage from '@/pages/members/MemberDetailPage';
 import GymPage from '@/pages/gym/GymPage';
 import PlansPage from '@/pages/plans/PlansPage';
+import PtPlansPage from '@/pages/plans/PtPlansPage';
+import ServicesPage from '@/pages/services/ServicesPage';
+import BatchesPage from '@/pages/batches/BatchesPage';
 import ReportsPage from '@/pages/ReportsPage';
 
 function RedirectIfAuth({ children }: { children: React.ReactNode }) {
@@ -51,6 +54,9 @@ function AppRoutes() {
         <Route path="/members/:id" element={<MemberDetailPage />} />
         <Route path="/gym" element={<GymPage />} />
         <Route path="/gym/plans" element={<PlansPage />} />
+        <Route path="/gym/pt-plans" element={<PtPlansPage />} />
+        <Route path="/gym/services" element={<ServicesPage />} />
+        <Route path="/gym/batches" element={<BatchesPage />} />
         <Route path="/reports" element={<ReportsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

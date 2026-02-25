@@ -41,35 +41,49 @@ export interface AuthData {
 
 export type AuthResponse = ApiResponse<AuthData>;
 
-// Gym Profile
+// Gym Profile — matches GET /subscriber response.data
+export interface GymAdmin {
+  name: string;
+  email: string;
+  _id: string;
+  createdAt?: string;
+  languageCode?: string;
+  emailVerified?: boolean;
+}
+
 export interface GymProfile {
   _id: string;
   subID?: string;
+  subName: string;
+  subLogo?: string;
   name: string;
-  gymName: string;
-  subName?: string;
   email: string;
   mobile?: string;
   callingCode?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  logo?: string;
+  countryCode?: string;
+  emailVerified?: boolean;
   languageCode?: string;
   currencyCode?: string;
-  countryCode?: string;
-  memberCount?: number;
-  packageCount?: number;
+  referralCode?: number;
+  smsCount?: number;
   totalPackage?: number;
-  totalPtPlan?: number;
   totalService?: number;
-  role?: string;
+  totalPtPlan?: number;
+  isAdmin?: boolean;
+  isDeleted?: boolean;
+  admin?: GymAdmin;
+  adminUserID?: string;
+  userID?: string;
+  subscriptionExp?: string;
+  isTrialSubscription?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Packages
 export interface Package {
   _id: string;
+  planId?: string;
   name: string;
   price: number;
   month?: number | null;
@@ -87,6 +101,39 @@ export interface PackageCreateRequest {
 
 export interface PackageEditRequest extends PackageCreateRequest {
   packageID: string;
+}
+
+// Batches
+export interface Batch {
+  _id: string;
+  name: string;
+  batchLimit: number;
+  startTime: string;
+  endTime: string;
+  currentMember: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface BatchRequest {
+  name: string;
+  batchLimit: number;
+  startTime: string;
+  endTime: string;
+}
+
+// Services
+export interface Service {
+  _id: string;
+  name: string;
+  price: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ServiceRequest {
+  name: string;
+  price: number | string;
 }
 
 // Members

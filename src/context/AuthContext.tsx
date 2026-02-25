@@ -21,8 +21,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchGym = useCallback(async () => {
     try {
-      const profile = await getGymDetailAPI();
-      setGym(profile);
+      const res = await getGymDetailAPI();
+      setGym(res.data);
     } catch {
       removeToken();
       setGym(null);

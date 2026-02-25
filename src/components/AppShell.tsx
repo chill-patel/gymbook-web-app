@@ -87,10 +87,10 @@ export default function AppShell() {
       <Divider />
       <Box sx={{ p: 2 }}>
         <Typography variant="body2" color="text.secondary" noWrap>
-          {gym?.gymName}
+          {gym?.subName}
         </Typography>
         <Typography variant="caption" color="text.secondary" noWrap>
-          {gym?.email}
+          {gym?.admin?.email ?? gym?.email}
         </Typography>
       </Box>
     </Box>
@@ -145,7 +145,7 @@ export default function AppShell() {
               <Avatar
                 sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: 14 }}
               >
-                {gym?.name?.charAt(0)?.toUpperCase() ?? 'G'}
+                {(gym?.admin?.name ?? gym?.subName ?? 'G').charAt(0).toUpperCase()}
               </Avatar>
             </IconButton>
             <Menu

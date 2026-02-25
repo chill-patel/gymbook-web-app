@@ -1,0 +1,197 @@
+// Auth
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface SignUpRequest {
+  subName: string;
+  name: string;
+  email: string;
+  password: string;
+  mobile: string;
+  callingCode: string;
+  countryCode: string;
+  referBy?: string;
+}
+
+// SignUp returns { authToken } directly (no ApiResponse wrapper)
+export interface SignUpResponse {
+  authToken: string;
+}
+
+export interface EmailExistResponse {
+  isUserExist: boolean;
+}
+
+export interface EmailExistRequest {
+  email: string;
+}
+
+// Server wraps all responses in: { error: boolean, status: number, data: T }
+export interface ApiResponse<T> {
+  error: boolean;
+  status: number;
+  data: T;
+}
+
+export interface AuthData {
+  authToken: string;
+}
+
+export type AuthResponse = ApiResponse<AuthData>;
+
+// Gym Profile
+export interface GymProfile {
+  _id: string;
+  subID?: string;
+  name: string;
+  gymName: string;
+  subName?: string;
+  email: string;
+  mobile?: string;
+  callingCode?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  logo?: string;
+  languageCode?: string;
+  currencyCode?: string;
+  countryCode?: string;
+  memberCount?: number;
+  packageCount?: number;
+  totalPackage?: number;
+  totalPtPlan?: number;
+  totalService?: number;
+  role?: string;
+}
+
+// Packages
+export interface Package {
+  _id: string;
+  name: string;
+  price: number;
+  month?: number | null;
+  days?: number | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PackageCreateRequest {
+  name: string;
+  price: number | string;
+  month?: number | null;
+  days?: number | null;
+}
+
+export interface PackageEditRequest extends PackageCreateRequest {
+  packageID: string;
+}
+
+// Members
+export interface Member {
+  _id: string;
+  name: string;
+  email?: string;
+  mobile?: string;
+  callingCode?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  address?: string;
+  profileImage?: string;
+  membershipStatus?: 'active' | 'inactive';
+  joiningDate?: string;
+  packages?: MemberPackage[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface MemberPackage {
+  _id: string;
+  packageName: string;
+  startDate: string;
+  endDate: string;
+  price: number;
+  discount?: number;
+  paidAmount: number;
+  dueAmount: number;
+  status?: string;
+}
+
+export interface MemberStats {
+  totalMembers: number;
+  activeMembers: number;
+  inactiveMembers: number;
+  expiringMembers: number;
+  expiredMembers: number;
+  newJoinings?: number;
+}
+
+export interface CollectionStats {
+  totalCollection: number;
+  totalDue: number;
+  todayCollection: number;
+}
+
+export interface MemberListParams {
+  startIndex: number;
+  query?: string;
+  packageName?: string;
+  memberContext?: string;
+  gender?: string;
+  batchId?: string;
+  orderBy?: string;
+  includeDeleted?: boolean;
+}
+
+// Payments
+export interface Payment {
+  _id: string;
+  paidAmount: number;
+  paymentDate: string;
+  paymentMethod?: string;
+}
+
+// Visitors
+export interface Visitor {
+  _id: string;
+  name: string;
+  mobile?: string;
+  email?: string;
+  leadStatus?: string;
+  createdAt?: string;
+}
+
+// Expenses
+export interface Expense {
+  _id: string;
+  title: string;
+  amount: number;
+  category?: string;
+  date: string;
+  description?: string;
+}
+
+// Dashboard Analytics
+export interface AnalyticsStat {
+  name: string;
+  count: number;
+  type: string;
+  icon: string;
+  iconColor?: string;
+  isCurrency: boolean;
+}
+
+export interface AnalyticsSection {
+  header: string;
+  child: AnalyticsStat[];
+}
+
+export type AnalyticsResponse = ApiResponse<AnalyticsSection[]>;
+
+// Paginated response
+export interface PaginatedResponse<T> {
+  data: T[];
+  totalCount: number;
+}

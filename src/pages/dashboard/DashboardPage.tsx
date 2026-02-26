@@ -21,9 +21,11 @@ import {
   Block as BlockIcon,
   ChevronRight as ChevronIcon,
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router';
 import { getMemberAnalyticsAPI } from '@/api/gym';
 import type { AnalyticsSection, AnalyticsStat } from '@/api/types';
 import { Colors } from '@/theme';
+import { reportMapping, memberContextMap } from '@/config/dashboardFilter';
 
 // Map server icon names to MUI icons
 const iconMap: Record<string, React.ReactNode> = {
@@ -58,9 +60,11 @@ function formatValue(count: number, isCurrency: boolean, currency: string): stri
 function StatTile({
   stat,
   currency,
+  onClick,
 }: {
   stat: AnalyticsStat;
   currency: string;
+  onClick?: () => void;
 }) {
   const valueColor = stat.iconColor ? (colorMap[stat.iconColor] ?? Colors.primary) : Colors.primary;
   const isHighlighted = highlightTypes.has(stat.type);
@@ -75,7 +79,7 @@ function StatTile({
         bgcolor: isHighlighted ? `${Colors.primary}08` : '#FAFAFA',
       }}
     >
-      <CardActionArea sx={{ height: '100%' }}>
+      <CardActionArea sx={{ height: '100%' }} onClick={onClick}>
         <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
           {/* Top row: value + icon */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -99,6 +103,7 @@ function StatTile({
 }
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const [sections, setSections] = useState<AnalyticsSection[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -115,6 +120,17 @@ export default function DashboardPage() {
 
   // TODO: get currency from gym profile context
   const currency = '₹';
+
+  const handleTileClick = (type: string) => {
+    const route = reportMapping[type];
+    if (!route) return;
+    if (route === '/members') {
+      const ctx = memberContextMap[type] ?? '';
+      navigate(ctx ? `/members?context=${encodeURIComponent(ctx)}` : '/members');
+    } else {
+      navigate(`${route}?context=${encodeURIComponent(type)}`);
+    }
+  };
 
   if (loading) {
     return (
@@ -152,7 +168,7 @@ export default function DashboardPage() {
           <Grid container spacing={1.5}>
             {section.child.map((stat) => (
               <Grid key={stat.type} size={{ xs: 6, sm: 6, md: 3 }}>
-                <StatTile stat={stat} currency={currency} />
+                <StatTile stat={stat} currency={currency} onClick={() => handleTileClick(stat.type)} />
               </Grid>
             ))}
           </Grid>

@@ -26,6 +26,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { getMemberPrerequisiteAPI, addMemberAPI } from '@/api/member';
 import type { Package, Batch, AddMemberRequest } from '@/api/types';
+import MuiPhoneInput from '@/components/MuiPhoneInput';
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -37,6 +38,9 @@ const schema = z.object({
   address: z.string().optional(),
   dob: z.string().optional(),
   notes: z.string().optional(),
+  membershipId: z.string().optional(),
+  aadharNumber: z.string().optional(),
+  occupation: z.string().optional(),
   packageID: z.string().optional(),
   batchId: z.string().optional(),
   paid: z.string().optional(),
@@ -100,6 +104,9 @@ export default function AddMemberPage() {
       address: '',
       dob: '',
       notes: '',
+      membershipId: '',
+      aadharNumber: '',
+      occupation: '',
       packageID: '',
       batchId: '',
       paid: '',
@@ -138,7 +145,9 @@ export default function AddMemberPage() {
       const pkgs = res.data.packages ?? [];
       setPackages(pkgs);
       setBatches(res.data.batch ?? []);
-      setMembershipId(res.data.membershipId ?? 0);
+      const mId = res.data.membershipId ?? 0;
+      setMembershipId(mId);
+      if (mId) setValue('membershipId', String(mId));
       if (pkgs.length > 0) {
         setValue('packageID', pkgs[0]!._id);
       }
@@ -169,7 +178,7 @@ export default function AddMemberPage() {
     const body: AddMemberRequest = {
       name: data.name,
       gender: data.gender,
-      membershipId: String(membershipId),
+      membershipId: data.membershipId || String(membershipId),
       dateOfJoing: joiningDate,
       ...(data.email && { email: data.email }),
       ...(data.mobile && { mobile: data.mobile }),
@@ -178,6 +187,8 @@ export default function AddMemberPage() {
       ...(data.address && { address: data.address }),
       ...(data.dob && { dob: data.dob }),
       ...(data.notes && { notes: data.notes }),
+      ...(data.aadharNumber && { aadharNumber: data.aadharNumber }),
+      ...(data.occupation && { occupation: data.occupation }),
       ...(data.batchId && { batchId: data.batchId }),
       ...(data.comment && { comment: data.comment }),
       ...(data.paymentMethod && { paymentMethod: data.paymentMethod }),
@@ -298,18 +309,22 @@ export default function AddMemberPage() {
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                    <TextField label="Mobile" fullWidth {...register('mobile')} />
+                    <MuiPhoneInput
+                      onPhoneChange={(data) => {
+                        setValue('mobile', data.nationalNumber);
+                        setValue('callingCode', data.callingCode);
+                        setValue('countryCode', data.countryCode);
+                      }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <TextField label="Email" fullWidth type="email" {...register('email')} />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <TextField
-                      label="Date of Birth"
+                      label="Membership ID"
                       fullWidth
-                      type="date"
-                      slotProps={{ inputLabel: { shrink: true } }}
-                      {...register('dob')}
+                      {...register('membershipId')}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -321,10 +336,36 @@ export default function AddMemberPage() {
                       {...register('dateOfJoing')}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            {/* Additional Details */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+                <Typography variant="subtitle1" fontWeight={600} mb={2.5}>
+                  Additional Details
+                </Typography>
+                <Grid container spacing={2.5}>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <TextField
+                      label="Date of Birth"
+                      fullWidth
+                      type="date"
+                      slotProps={{ inputLabel: { shrink: true } }}
+                      {...register('dob')}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <TextField label="Occupation" fullWidth {...register('occupation')} />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <TextField label="Aadhar Number" fullWidth {...register('aadharNumber')} />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <TextField label="Address" fullWidth multiline rows={2} {...register('address')} />
                   </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <TextField label="Notes" fullWidth multiline rows={2} {...register('notes')} />
                   </Grid>
                 </Grid>

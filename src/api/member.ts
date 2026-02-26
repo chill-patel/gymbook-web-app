@@ -77,19 +77,41 @@ export const getMembersByContextAPI = (
 // Reports
 export const salesReportAPI = (params: {
   totalItemCount: number;
-  startDate: string;
-  endDate: string;
+  startDate?: number;
+  endDate?: number;
   paymentMethod?: string;
   planType?: string;
 }) =>
-  client.get('/member/today-report', { params });
+  client.get('/member/today-report', {
+    params: { ...params, apiVersion: 1 },
+  });
 
 export const planReportAPI = (params: {
   totalItemCount: number;
-  startDate: string;
-  endDate: string;
+  startDate?: number;
+  endDate?: number;
 }) =>
   client.get('/member/plans', { params });
+
+export const ptPlanReportAPI = (params: {
+  totalItemCount: number;
+  startDate?: number;
+  endDate?: number;
+}) =>
+  client.get('/member/pt-plans-due', { params });
+
+export const admissionReportAPI = (params: {
+  totalItemCount: number;
+  startDate?: number;
+  endDate?: number;
+}) =>
+  client.get('/member/admission-report', { params });
+
+export const getAllUserAttendanceReportAPI = (params: {
+  startDate: number;
+  endDate: number;
+}) =>
+  client.get('/member/punch-reports', { params });
 
 export const getMemberTrendsAPI = (year: string | number) =>
   client.get('/member/report/trends', { params: { timeperiod: year } });

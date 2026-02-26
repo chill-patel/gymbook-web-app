@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -9,22 +10,17 @@ import {
   Chip,
   Divider,
   FormControl,
+  IconButton,
   InputAdornment,
   InputLabel,
   LinearProgress,
   MenuItem,
   Select,
   Skeleton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  Snackbar,
   TextField,
+  Tooltip,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import {
@@ -36,10 +32,11 @@ import {
   Badge as IdIcon,
   FilterList as FilterIcon,
   Close as CloseIcon,
-  ChevronRight as ChevRight,
+  WhatsApp as WhatsAppIcon,
+  FingerprintOutlined as AttendanceIcon,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router';
-import { getAllMembersAPI } from '@/api/member';
+import { useNavigate, useSearchParams } from 'react-router';
+import { getAllMembersAPI, punchInOutAPI } from '@/api/member';
 import { getAllPackagesAPI, getAllBatchesAPI } from '@/api/gym';
 import type { Member, Package, Batch } from '@/api/types';
 
@@ -98,7 +95,7 @@ function formatDate(dateStr: string): string {
 
 // ─── Mobile Member Card ──────────────────────────────────
 
-function MemberCard({ member, onClick }: { member: Member; onClick: () => void }) {
+function MemberCard({ member, onClick, onAttendance }: { member: Member; onClick: () => void; onAttendance: (m: Member) => void }) {
   const stripColor = getStripColor(member.membershipExpiryDate);
   const statusLabel = getStatusLabel(member.membershipExpiryDate);
   const mobile = member.mobile
@@ -106,190 +103,123 @@ function MemberCard({ member, onClick }: { member: Member; onClick: () => void }
     : '';
   const hasDue = member.pendingAmount != null && Number(member.pendingAmount) > 0;
 
+  const handleCall = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (member.mobile) {
+      window.open(`tel:${member.callingCode ? `+${member.callingCode}` : ''}${member.mobile}`);
+    }
+  };
+
+  const handleWhatsApp = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (member.mobile) {
+      const phone = `${member.callingCode ?? '91'}${member.mobile}`;
+      window.open(`https://wa.me/${phone}`, '_blank');
+    }
+  };
+
+  const handleAttendance = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAttendance(member);
+  };
+
   return (
     <Card sx={{ display: 'flex', overflow: 'hidden', height: '100%' }}>
       <Box sx={{ width: 5, bgcolor: stripColor, flexShrink: 0 }} />
-      <CardActionArea
-        onClick={onClick}
-        sx={{ height: '100%', display: 'flex', alignItems: 'stretch' }}
-      >
-        <CardContent sx={{ flex: 1, p: 2.5, '&:last-child': { pb: 2.5 } }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
-            <Avatar
-              src={member.photo}
-              sx={{ width: 64, height: 64, bgcolor: 'primary.main', fontSize: 24, fontWeight: 600 }}
-            >
-              {member.name?.charAt(0)?.toUpperCase()}
-            </Avatar>
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography variant="body1" fontWeight={600} noWrap>
-                {member.name}
-              </Typography>
-              {member.membershipId != null && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
-                  <IdIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
-                  <Typography variant="caption" color="text.secondary">
-                    ID: {member.membershipId}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <CardActionArea
+          onClick={onClick}
+          sx={{ flex: 1, display: 'flex', alignItems: 'stretch' }}
+        >
+          <CardContent sx={{ flex: 1, p: 2.5, '&:last-child': { pb: 2 } }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
+              <Avatar
+                src={member.photo}
+                sx={{ width: 64, height: 64, bgcolor: 'primary.main', fontSize: 24, fontWeight: 600 }}
+              >
+                {member.name?.charAt(0)?.toUpperCase()}
+              </Avatar>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography variant="body1" fontWeight={600} noWrap>
+                  {member.name}
+                </Typography>
+                {member.membershipId != null && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
+                    <IdIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
+                    <Typography variant="caption" color="text.secondary">
+                      ID: {member.membershipId}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+              <Chip
+                label={statusLabel}
+                size="small"
+                sx={{
+                  bgcolor: `${stripColor}1A`,
+                  color: stripColor,
+                  fontWeight: 600,
+                  fontSize: 11,
+                  height: 24,
+                }}
+              />
+            </Box>
+
+            <Divider sx={{ mb: 1.5 }} />
+
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+              {mobile && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                  <PhoneIcon sx={{ fontSize: 15, color: 'text.disabled' }} />
+                  <Typography variant="body2" color="text.secondary">{mobile}</Typography>
+                </Box>
+              )}
+              {member.membershipExpiryDate && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                  <EventIcon sx={{ fontSize: 15, color: 'text.disabled' }} />
+                  <Typography variant="body2" color="text.secondary">Exp:</Typography>
+                  <Typography variant="body2" fontWeight={600} sx={{ color: stripColor }}>
+                    {formatDate(member.membershipExpiryDate)}
+                  </Typography>
+                </Box>
+              )}
+              {member.pendingAmount != null && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                  <RupeeIcon sx={{ fontSize: 15, color: 'text.disabled' }} />
+                  <Typography variant="body2" color="text.secondary">Due:</Typography>
+                  <Typography variant="body2" fontWeight={600} sx={{ color: hasDue ? '#E57373' : '#81C784' }}>
+                    {member.pendingAmount}
                   </Typography>
                 </Box>
               )}
             </Box>
-            <Chip
-              label={statusLabel}
-              size="small"
-              sx={{
-                bgcolor: `${stripColor}1A`,
-                color: stripColor,
-                fontWeight: 600,
-                fontSize: 11,
-                height: 24,
-              }}
-            />
-          </Box>
+          </CardContent>
+        </CardActionArea>
 
-          <Divider sx={{ mb: 1.5 }} />
-
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-            {mobile && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                <PhoneIcon sx={{ fontSize: 15, color: 'text.disabled' }} />
-                <Typography variant="body2" color="text.secondary">{mobile}</Typography>
-              </Box>
-            )}
-            {member.membershipExpiryDate && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                <EventIcon sx={{ fontSize: 15, color: 'text.disabled' }} />
-                <Typography variant="body2" color="text.secondary">Exp:</Typography>
-                <Typography variant="body2" fontWeight={600} sx={{ color: stripColor }}>
-                  {formatDate(member.membershipExpiryDate)}
-                </Typography>
-              </Box>
-            )}
-            {member.pendingAmount != null && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                <RupeeIcon sx={{ fontSize: 15, color: 'text.disabled' }} />
-                <Typography variant="body2" color="text.secondary">Due:</Typography>
-                <Typography variant="body2" fontWeight={600} sx={{ color: hasDue ? '#E57373' : '#81C784' }}>
-                  {member.pendingAmount}
-                </Typography>
-              </Box>
-            )}
-          </Box>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-}
-
-// ─── Desktop Table Row ───────────────────────────────────
-
-function MemberTableRow({ member, onClick }: { member: Member; onClick: () => void }) {
-  const stripColor = getStripColor(member.membershipExpiryDate);
-  const statusLabel = getStatusLabel(member.membershipExpiryDate);
-  const mobile = member.mobile
-    ? `${member.callingCode ? `+${member.callingCode}` : ''} ${member.mobile}`
-    : '—';
-  const hasDue = member.pendingAmount != null && Number(member.pendingAmount) > 0;
-
-  return (
-    <TableRow
-      hover
-      onClick={onClick}
-      sx={{ cursor: 'pointer', '&:last-child td': { borderBottom: 0 } }}
-    >
-      <TableCell sx={{ pl: 0, width: 4, p: 0 }}>
-        <Box sx={{ width: 4, height: '100%', minHeight: 52, bgcolor: stripColor, borderRadius: '2px 0 0 2px' }} />
-      </TableCell>
-      <TableCell>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Avatar
-            src={member.photo}
-            sx={{ width: 36, height: 36, bgcolor: 'primary.main', fontSize: 14, fontWeight: 600 }}
-          >
-            {member.name?.charAt(0)?.toUpperCase()}
-          </Avatar>
-          <Box sx={{ minWidth: 0 }}>
-            <Typography variant="body2" fontWeight={600} noWrap>
-              {member.name}
-            </Typography>
-            {member.membershipId != null && (
-              <Typography variant="caption" color="text.secondary">
-                ID: {member.membershipId}
-              </Typography>
-            )}
-          </Box>
+        {/* Quick Actions */}
+        <Divider />
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: 1, py: 0.5, gap: 0.5 }}>
+          {member.mobile && (
+            <Tooltip title="Call">
+              <IconButton size="small" onClick={handleCall} sx={{ color: 'text.secondary' }}>
+                <PhoneIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+          {member.mobile && (
+            <Tooltip title="WhatsApp">
+              <IconButton size="small" onClick={handleWhatsApp} sx={{ color: '#25D366' }}>
+                <WhatsAppIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+          <Tooltip title="Mark Attendance">
+            <IconButton size="small" onClick={handleAttendance} sx={{ color: 'text.secondary' }}>
+              <AttendanceIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Box>
-      </TableCell>
-      <TableCell>
-        <Typography variant="body2" color="text.secondary">{mobile}</Typography>
-      </TableCell>
-      <TableCell>
-        <Chip
-          label={statusLabel}
-          size="small"
-          sx={{
-            bgcolor: `${stripColor}1A`,
-            color: stripColor,
-            fontWeight: 600,
-            fontSize: 11,
-            height: 22,
-          }}
-        />
-      </TableCell>
-      <TableCell>
-        {member.membershipExpiryDate ? (
-          <Typography variant="body2" fontWeight={500} sx={{ color: stripColor }}>
-            {formatDate(member.membershipExpiryDate)}
-          </Typography>
-        ) : (
-          <Typography variant="body2" color="text.disabled">—</Typography>
-        )}
-      </TableCell>
-      <TableCell>
-        <Typography
-          variant="body2"
-          fontWeight={600}
-          sx={{ color: hasDue ? '#E57373' : '#81C784' }}
-        >
-          {member.pendingAmount != null ? `₹${member.pendingAmount}` : '—'}
-        </Typography>
-      </TableCell>
-      <TableCell align="right" sx={{ pr: 1 }}>
-        <ChevRight sx={{ fontSize: 18, color: 'text.disabled' }} />
-      </TableCell>
-    </TableRow>
-  );
-}
-
-// ─── Desktop Table View ──────────────────────────────────
-
-function MemberTable({ members, onRowClick, fetching }: {
-  members: Member[];
-  onRowClick: (id: string) => void;
-  fetching: boolean;
-}) {
-  return (
-    <Card sx={{ opacity: fetching ? 0.5 : 1, transition: 'opacity 0.15s ease' }}>
-      <TableContainer>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ width: 4, p: 0 }} />
-              <TableCell sx={{ fontWeight: 600, fontSize: 12, color: 'text.secondary' }}>Member</TableCell>
-              <TableCell sx={{ fontWeight: 600, fontSize: 12, color: 'text.secondary' }}>Mobile</TableCell>
-              <TableCell sx={{ fontWeight: 600, fontSize: 12, color: 'text.secondary' }}>Status</TableCell>
-              <TableCell sx={{ fontWeight: 600, fontSize: 12, color: 'text.secondary' }}>Expiry</TableCell>
-              <TableCell sx={{ fontWeight: 600, fontSize: 12, color: 'text.secondary' }}>Due</TableCell>
-              <TableCell sx={{ width: 40 }} />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {members.map((m) => (
-              <MemberTableRow key={m._id} member={m} onClick={() => onRowClick(m._id)} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      </Box>
     </Card>
   );
 }
@@ -298,8 +228,8 @@ function MemberTable({ members, onRowClick, fetching }: {
 
 export default function MemberListPage() {
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+  const [searchParams] = useSearchParams();
+  const urlContext = searchParams.get('context') ?? '';
 
   const [members, setMembers] = useState<Member[]>([]);
   const [page, setPage] = useState(0);
@@ -311,8 +241,10 @@ export default function MemberListPage() {
   const [showFilters, setShowFilters] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // Filters
-  const [memberContext, setMemberContext] = useState('');
+  const [toast, setToast] = useState<{ message: string; severity: 'success' | 'error' } | null>(null);
+
+  // Filters — init from URL context if present
+  const [memberContext, setMemberContext] = useState(urlContext);
   const [orderBy, setOrderBy] = useState('createdAt');
   const [gender, setGender] = useState('');
   const [packageName, setPackageName] = useState('');
@@ -386,6 +318,15 @@ export default function MemberListPage() {
     setPackageName('');
     setBatchId('');
     setPage(0);
+  };
+
+  const handleAttendance = async (member: Member) => {
+    try {
+      await punchInOutAPI(member._id);
+      setToast({ message: `Attendance marked for ${member.name}`, severity: 'success' });
+    } catch {
+      setToast({ message: 'Failed to mark attendance', severity: 'error' });
+    }
   };
 
   return (
@@ -554,21 +495,13 @@ export default function MemberListPage() {
 
       {/* Member list */}
       {initialLoad ? (
-        isDesktop ? (
-          <Card>
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} variant="rectangular" height={52} sx={{ mx: 2, my: 1, borderRadius: 1 }} />
-            ))}
-          </Card>
-        ) : (
-          <Grid container spacing={2}>
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Grid key={i} size={{ xs: 12, sm: 6 }}>
-                <Skeleton variant="rounded" height={170} />
-              </Grid>
-            ))}
-          </Grid>
-        )
+        <Grid container spacing={2}>
+          {Array.from({ length: 9 }).map((_, i) => (
+            <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
+              <Skeleton variant="rounded" height={170} />
+            </Grid>
+          ))}
+        </Grid>
       ) : members.length === 0 && !fetching ? (
         <Card>
           <CardContent sx={{ textAlign: 'center', py: 8 }}>
@@ -585,37 +518,6 @@ export default function MemberListPage() {
             </Button>
           </CardContent>
         </Card>
-      ) : isDesktop ? (
-        <>
-          <MemberTable
-            members={members}
-            onRowClick={(id) => navigate(`/members/${id}`)}
-            fetching={fetching}
-          />
-
-          {/* Pagination */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              Page {page + 1}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                variant="outlined"
-                disabled={page === 0}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outlined"
-                disabled={!hasMore}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next
-              </Button>
-            </Box>
-          </Box>
-        </>
       ) : (
         <>
           <Grid
@@ -624,8 +526,8 @@ export default function MemberListPage() {
             sx={{ opacity: fetching ? 0.5 : 1, transition: 'opacity 0.15s ease' }}
           >
             {members.map((m) => (
-              <Grid key={m._id} size={{ xs: 12, sm: 6 }}>
-                <MemberCard member={m} onClick={() => navigate(`/members/${m._id}`)} />
+              <Grid key={m._id} size={{ xs: 12, sm: 6, md: 4 }}>
+                <MemberCard member={m} onClick={() => navigate(`/members/${m._id}`)} onAttendance={handleAttendance} />
               </Grid>
             ))}
           </Grid>
@@ -654,6 +556,18 @@ export default function MemberListPage() {
           </Box>
         </>
       )}
+      <Snackbar
+        open={!!toast}
+        autoHideDuration={3000}
+        onClose={() => setToast(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        {toast ? (
+          <Alert severity={toast.severity} onClose={() => setToast(null)} variant="filled">
+            {toast.message}
+          </Alert>
+        ) : undefined}
+      </Snackbar>
     </Box>
   );
 }

@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { Member, Batch } from '@/api/types';
 import { getAllBatchesAPI } from '@/api/gym';
+import MuiPhoneInput from '@/components/MuiPhoneInput';
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -47,6 +48,7 @@ export default function EditProfileDialog({ open, onClose, onSave, member }: Pro
     handleSubmit,
     reset,
     control,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -129,10 +131,14 @@ export default function EditProfileDialog({ open, onClose, onSave, member }: Pro
             />
           </Box>
 
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <TextField label="Calling Code" sx={{ width: 120 }} {...register('callingCode')} />
-            <TextField label="Mobile" fullWidth {...register('mobile')} />
-          </Box>
+          <MuiPhoneInput
+            defaultCountry={(member.countryCode || 'IN').toLowerCase() as 'in'}
+            initialPhone={`+${member.callingCode || '91'}${member.mobile || ''}`}
+            onPhoneChange={(data) => {
+              setValue('mobile', data.nationalNumber);
+              setValue('callingCode', data.callingCode);
+            }}
+          />
 
           <TextField label="Email" fullWidth {...register('email')} />
 

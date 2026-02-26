@@ -22,8 +22,8 @@ const PAYMENT_METHODS = ['Cash', 'Card', 'UPI', 'Online', 'Bank Transfer', 'Cheq
 const schema = z.object({
   ptPlanID: z.string().min(1, 'PT Plan is required'),
   joiningDate: z.string().min(1, 'Start date is required'),
-  paid: z.string().default('0'),
-  discount: z.string().default('0'),
+  paid: z.string().default(''),
+  discount: z.string().default(''),
   discountType: z.enum(['percent', 'amount']),
   paymentMethod: z.string().default('Cash'),
   comment: z.string().default(''),
@@ -68,14 +68,20 @@ export default function AddPtPlanDialog({ open, onClose, onSave, memberId }: Pro
       reset({
         ptPlanID: '',
         joiningDate: today,
-        paid: '0',
-        discount: '0',
+        paid: '',
+        discount: '',
         discountType: 'percent',
         paymentMethod: 'Cash',
         comment: '',
       });
 
-      getAllPtPlansAPI().then((res) => setPtPlans(res.data ?? [])).catch(() => {});
+      getAllPtPlansAPI().then((res) => {
+        const list = res.data ?? [];
+        setPtPlans(list);
+        if (list.length > 0) {
+          setValue('ptPlanID', list[0]!._id);
+        }
+      }).catch(() => {});
 
       // Set start date to day after latest PT plan expiry (matching mobile)
       if (memberId) {

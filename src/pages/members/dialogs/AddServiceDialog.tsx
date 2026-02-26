@@ -19,8 +19,8 @@ import type { Service } from '@/api/types';
 const schema = z.object({
   serviceID: z.string().min(1, 'Service is required'),
   joiningDate: z.string().min(1, 'Date is required'),
-  paid: z.string().default('0'),
-  discount: z.string().default('0'),
+  paid: z.string().default(''),
+  discount: z.string().default(''),
   discountType: z.enum(['percent', 'amount']),
   comment: z.string().default(''),
 });
@@ -49,8 +49,8 @@ export default function AddServiceDialog({ open, onClose, onSave }: Props) {
     defaultValues: {
       serviceID: '',
       joiningDate: new Date().toISOString().slice(0, 10),
-      paid: '0',
-      discount: '0',
+      paid: '',
+      discount: '',
       discountType: 'percent',
       comment: '',
     },

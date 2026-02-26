@@ -19,6 +19,11 @@ import PtPlansPage from '@/pages/plans/PtPlansPage';
 import ServicesPage from '@/pages/services/ServicesPage';
 import BatchesPage from '@/pages/batches/BatchesPage';
 import ReportsPage from '@/pages/ReportsPage';
+import SalesReportPage from '@/pages/reports/SalesReportPage';
+import PlanReportPage from '@/pages/reports/PlanReportPage';
+import PtPlanReportPage from '@/pages/reports/PtPlanReportPage';
+import AdmissionReportPage from '@/pages/reports/AdmissionReportPage';
+import AttendanceReportPage from '@/pages/reports/AttendanceReportPage';
 
 function RedirectIfAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -66,6 +71,11 @@ function AppRoutes() {
         <Route path="/gym/services" element={<ServicesPage />} />
         <Route path="/gym/batches" element={<BatchesPage />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/reports/sales" element={<SalesReportPage />} />
+        <Route path="/reports/plan-due" element={<PlanReportPage />} />
+        <Route path="/reports/pt-plan-due" element={<PtPlanReportPage />} />
+        <Route path="/reports/admission" element={<AdmissionReportPage />} />
+        <Route path="/reports/attendance" element={<AttendanceReportPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

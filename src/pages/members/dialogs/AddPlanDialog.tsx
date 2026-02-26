@@ -22,13 +22,13 @@ const PAYMENT_METHODS = ['Cash', 'Card', 'UPI', 'Online', 'Bank Transfer', 'Cheq
 const schema = z.object({
   packageID: z.string().min(1, 'Plan is required'),
   joiningDate: z.string().min(1, 'Start date is required'),
-  paid: z.string().default('0'),
-  discount: z.string().default('0'),
+  paid: z.string().default(''),
+  discount: z.string().default(''),
   discountType: z.enum(['percent', 'amount']),
   paymentMethod: z.string().default('Cash'),
   paymentDate: z.string().min(1, 'Payment date is required'),
   comment: z.string().default(''),
-  admissionFees: z.string().default('0'),
+  admissionFees: z.string().default(''),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -56,13 +56,13 @@ export default function AddPlanDialog({ open, onClose, onSave, memberId }: Props
     defaultValues: {
       packageID: '',
       joiningDate: new Date().toISOString().slice(0, 10),
-      paid: '0',
-      discount: '0',
+      paid: '',
+      discount: '',
       discountType: 'percent',
       paymentMethod: 'Cash',
       paymentDate: new Date().toISOString().slice(0, 10),
       comment: '',
-      admissionFees: '0',
+      admissionFees: '',
     },
   });
 
@@ -72,13 +72,13 @@ export default function AddPlanDialog({ open, onClose, onSave, memberId }: Props
       reset({
         packageID: '',
         joiningDate: today,
-        paid: '0',
-        discount: '0',
+        paid: '',
+        discount: '',
         discountType: 'percent',
         paymentMethod: 'Cash',
         paymentDate: today,
         comment: '',
-        admissionFees: '0',
+        admissionFees: '',
       });
 
       getAllPackagesAPI().then((res) => {

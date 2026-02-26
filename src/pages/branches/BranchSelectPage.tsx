@@ -11,6 +11,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   Skeleton,
   Snackbar,
   TextField,
@@ -21,14 +22,17 @@ import {
   Add as AddIcon,
   CheckCircle as ActiveIcon,
   Business as BranchIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { getAllBranchesAPI, exchangeTokenAPI, addBranchAPI } from '@/api/branch';
 import type { GymBranch } from '@/api/branch';
 import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router';
 import { saveToken } from '@/api/client';
 import { Colors } from '@/theme';
 
 export default function BranchSelectPage() {
+  const navigate = useNavigate();
   const { gym, refreshGym } = useAuth();
   const [branches, setBranches] = useState<GymBranch[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,6 +104,14 @@ export default function BranchSelectPage() {
     return new Date(dateStr) < new Date();
   };
 
+  const handleDeleteBranch = (branch: GymBranch) => {
+    if (branch._id === currentBranchId) {
+      setToast({ message: 'Switch to another branch before deleting this one', severity: 'error' });
+      return;
+    }
+    navigate(`/delete-account?branchId=${branch._id}&branchName=${encodeURIComponent(branch.subName)}`);
+  };
+
   return (
     <Box sx={{ maxWidth: 900, mx: 'auto' }}>
       {/* Header */}
@@ -165,11 +177,11 @@ export default function BranchSelectPage() {
                       flexShrink: 0,
                     }}
                   />
-                  <Box sx={{ flex: 1 }}>
+                  <Box sx={{ flex: 1, display: 'flex' }}>
                     <CardActionArea
                       onClick={() => handleSwitch(branch)}
                       disabled={isCurrent || !!switching}
-                      sx={{ height: '100%' }}
+                      sx={{ flex: 1 }}
                     >
                       <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -211,6 +223,17 @@ export default function BranchSelectPage() {
                         )}
                       </CardContent>
                     </CardActionArea>
+                    {branches.length > 1 && branch.isAdmin && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', pr: 1 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDeleteBranch(branch)}
+                          sx={{ color: 'error.main' }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    )}
                   </Box>
                 </Card>
               </Grid>

@@ -165,7 +165,6 @@ export default function GymPage() {
       label: 'Staff Management',
       icon: <AdminIcon />,
       path: '/gym/staff',
-      disabled: true,
     },
     {
       label: 'Invoice Settings',
@@ -199,7 +198,7 @@ export default function GymPage() {
     {
       label: 'Help & Support',
       icon: <HelpIcon />,
-      disabled: true,
+      path: '/help',
     },
   ];
 

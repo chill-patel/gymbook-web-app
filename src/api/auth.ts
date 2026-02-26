@@ -24,3 +24,9 @@ export const loginWithGoogleAPI = (token: string) =>
   client.post<unknown, AuthResponse>('/subscriber/login-with-google', { token });
 
 export const logoutAPI = () => client.get('/subscriber/logout');
+
+export const deleteAccountAPI = (password: string) =>
+  client.delete('/subscriber/account', { data: { password } });
+
+export const deleteGymBranchAPI = (password: string, subID: string) =>
+  client.delete('/subscriber/branch', { data: { password, subID } });

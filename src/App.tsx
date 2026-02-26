@@ -33,6 +33,12 @@ import AddExpensePage from '@/pages/expenses/AddExpensePage';
 import EditExpensePage from '@/pages/expenses/EditExpensePage';
 import BranchSelectPage from '@/pages/branches/BranchSelectPage';
 import SubscriptionPage from '@/pages/subscription/SubscriptionPage';
+import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
+import DeleteAccountPage from '@/pages/auth/DeleteAccountPage';
+import HelpPage from '@/pages/help/HelpPage';
+import StaffListPage from '@/pages/staff/StaffListPage';
+import AddStaffPage from '@/pages/staff/AddStaffPage';
+import EditStaffPage from '@/pages/staff/EditStaffPage';
 
 function RedirectIfAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -79,6 +85,9 @@ function AppRoutes() {
         <Route path="/gym/pt-plans" element={<PtPlansPage />} />
         <Route path="/gym/services" element={<ServicesPage />} />
         <Route path="/gym/batches" element={<BatchesPage />} />
+        <Route path="/gym/staff" element={<StaffListPage />} />
+        <Route path="/gym/staff/add" element={<AddStaffPage />} />
+        <Route path="/gym/staff/edit" element={<EditStaffPage />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/reports/sales" element={<SalesReportPage />} />
         <Route path="/reports/plan-due" element={<PlanReportPage />} />
@@ -94,6 +103,9 @@ function AppRoutes() {
         <Route path="/expenses/edit" element={<EditExpensePage />} />
         <Route path="/branches" element={<BranchSelectPage />} />
         <Route path="/subscription" element={<SubscriptionPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/delete-account" element={<DeleteAccountPage />} />
+        <Route path="/help" element={<HelpPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

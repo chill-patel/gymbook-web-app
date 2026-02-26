@@ -61,6 +61,26 @@ export const editPackageAPI = (packageId: string, body: PackageCreateRequest) =>
 export const deletePackageAPI = (packageId: string) =>
   client.delete(`/subscriber/package/${packageId}`);
 
+// Staff / Extra Admin
+export const getStaffListAPI = () =>
+  client.get('/subscriber/admin/all');
+
+export const addStaffAPI = (body: {
+  name: string;
+  email: string;
+  mobile?: string;
+  callingCode?: string;
+  countryCode?: string;
+  password: string;
+  permission: string[];
+}) => client.post('/subscriber/admin', body);
+
+export const updateStaffAPI = (body: Record<string, unknown>) =>
+  client.put('/subscriber/admin', body);
+
+export const deleteStaffAPI = (userId: string) =>
+  client.delete(`/subscriber/admin/${userId}`);
+
 // PT Plans
 export const getAllPtPlansAPI = () =>
   client.get<unknown, ApiResponse<Package[]>>('/subscriber/pt-plans');

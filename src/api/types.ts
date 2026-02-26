@@ -136,34 +136,181 @@ export interface ServiceRequest {
   price: number | string;
 }
 
-// Members
+// Members — matches GET /member/:id detail response
 export interface Member {
   _id: string;
   name: string;
   email?: string;
   mobile?: string;
   callingCode?: string;
+  countryCode?: string;
   gender?: string;
-  dateOfBirth?: string;
+  dob?: string;
   address?: string;
-  profileImage?: string;
-  membershipStatus?: 'active' | 'inactive';
+  photo?: string;
+  membershipStatus?: boolean;
+  membershipId?: number;
+  batchId?: string;
   joiningDate?: string;
+  membershipExpiryDate?: string;
+  membershipCreatedDate?: string;
+  pendingAmount?: number;
   packages?: MemberPackage[];
+  services?: MemberService[];
+  ptPlans?: MemberPtPlan[];
+  notes?: string;
+  aadharNumber?: string;
+  occupation?: string;
+  biometricId?: string;
+  isFingerprintRegistered?: boolean;
+  measurement?: MemberMeasurement[];
+  batch?: MemberBatch;
+  totalPackage?: number;
+  totalService?: number;
+  totalPTPlans?: number;
+  isDeleted?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface MemberPackage {
   _id: string;
-  packageName: string;
-  startDate: string;
-  endDate: string;
-  price: number;
+  name: string;
+  totalAmount: number;
+  totalAfterDiscount?: number;
+  paid: number;
+  pendingAmount: number;
+  purchaseDate: string;
+  expiryDate: string;
   discount?: number;
+  discountType?: string;
+  admissionFees?: number;
+  comments?: { text: string; _id?: string; createdAt?: string }[];
+  invoices?: MemberInvoice[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface MemberInvoice {
+  _id: string;
+  invoiceNumber: string;
+  paymentDate: string;
+  planName: string;
+  totalAmount: number;
   paidAmount: number;
-  dueAmount: number;
-  status?: string;
+  pendingAmount: number;
+  memberName: string;
+  planType?: string;
+}
+
+export interface MemberService {
+  _id: string;
+  name: string;
+  price: number;
+  totalAmount?: number;
+  totalAfterDiscount?: number;
+  paid?: number;
+  pendingAmount?: number;
+  purchaseDate?: string;
+  expiryDate?: string;
+  discount?: number;
+  discountType?: string;
+  comments?: { text: string; _id?: string; createdAt?: string }[];
+}
+
+export interface MemberPtPlan {
+  _id: string;
+  name: string;
+  totalAmount: number;
+  totalAfterDiscount?: number;
+  paid?: number;
+  pendingAmount?: number;
+  purchaseDate?: string;
+  expiryDate?: string;
+  totalSessions?: number;
+  completedSessions?: number;
+  discount?: number;
+  discountType?: string;
+  admissionFees?: number;
+  comments?: { text: string; _id?: string; createdAt?: string }[];
+  invoices?: MemberInvoice[];
+  freezeStartDate?: string;
+  freezeEndDate?: string;
+  freezeStatus?: string;
+  freezeReason?: string;
+}
+
+export interface MeasurementItem {
+  type: string;
+  value: string;
+}
+
+export interface MemberMeasurement {
+  _id: string;
+  date: string;
+  measurement: MeasurementItem[];
+}
+
+export interface MemberBatch {
+  _id: string;
+  name: string;
+  batchLimit: number;
+  startTime: string;
+  endTime: string;
+  currentMember: number;
+}
+
+export interface AttendanceRecord {
+  date: string;
+  punchInAt?: string;
+  punchOutAt?: string;
+}
+
+// Member prerequisite — GET /member/prerequisite
+export interface MemberPrerequisite {
+  packages: Package[];
+  batch: Batch[];
+  membershipId: number;
+}
+
+// Add member request body
+export interface AddMemberRequest {
+  name: string;
+  gender: string;
+  email?: string;
+  mobile?: string;
+  countryCode?: string;
+  callingCode?: string;
+  address?: string;
+  dob?: string | null;
+  notes?: string;
+  membershipId?: string;
+  aadharNumber?: string;
+  occupation?: string;
+  dateOfJoing?: string | null;
+  paid?: string;
+  discount?: number | null;
+  discountType?: string;
+  comment?: string;
+  paymentDate?: string | null;
+  paymentMethod?: string;
+  admissionFees?: string;
+  packageID?: string;
+  batchId?: string;
+  packageDetail?: {
+    totalAmount: number;
+    paid: number;
+    purchaseDate: string;
+    expiryDate: string;
+    isActive: boolean;
+    name: string;
+    comments?: { text: string }[];
+    discount?: number | null;
+    discountType?: string;
+    pendingAmount: number;
+    totalAfterDiscount: number;
+    admissionFees?: string;
+  };
 }
 
 export interface MemberStats {

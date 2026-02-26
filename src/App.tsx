@@ -9,6 +9,10 @@ import SignUpPage from '@/pages/auth/SignUpPage';
 import DashboardPage from '@/pages/dashboard/DashboardPage';
 import MemberListPage from '@/pages/members/MemberListPage';
 import MemberDetailPage from '@/pages/members/MemberDetailPage';
+import MemberPlansPage from '@/pages/members/MemberPlansPage';
+import MemberPtPlansPage from '@/pages/members/MemberPtPlansPage';
+import MemberServicesPage from '@/pages/members/MemberServicesPage';
+import AddMemberPage from '@/pages/members/AddMemberPage';
 import GymPage from '@/pages/gym/GymPage';
 import PlansPage from '@/pages/plans/PlansPage';
 import PtPlansPage from '@/pages/plans/PtPlansPage';
@@ -51,7 +55,11 @@ function AppRoutes() {
       >
         <Route path="/" element={<DashboardPage />} />
         <Route path="/members" element={<MemberListPage />} />
+        <Route path="/members/add" element={<AddMemberPage />} />
         <Route path="/members/:id" element={<MemberDetailPage />} />
+        <Route path="/members/:id/plans" element={<MemberPlansPage />} />
+        <Route path="/members/:id/pt-plans" element={<MemberPtPlansPage />} />
+        <Route path="/members/:id/services" element={<MemberServicesPage />} />
         <Route path="/gym" element={<GymPage />} />
         <Route path="/gym/plans" element={<PlansPage />} />
         <Route path="/gym/pt-plans" element={<PtPlansPage />} />

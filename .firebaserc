@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "gymbook-web-app"
+  },
+  "targets": {
+    "gymbook-web-app": {
+      "hosting": {
+        "staging": [
+          "gymbook-web-app-staging"
+        ],
+        "prod": [
+          "gymbook-web-app"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

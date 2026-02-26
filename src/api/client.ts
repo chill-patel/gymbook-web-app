@@ -1,15 +1,15 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://dev-0.gymbook.in';
-const FALLBACK_URL = 'https://api-prod-1.gymbook.in';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const FALLBACK_URL = import.meta.env.VITE_API_FALLBACK_URL;
 
 const client = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
     'Cache-Control': 'no-cache',
-    source: 'web',
-    appVersion: '1.0.0',
+    source: import.meta.env.VITE_APP_SOURCE,
+    appVersion: import.meta.env.VITE_APP_VERSION,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   },
 });

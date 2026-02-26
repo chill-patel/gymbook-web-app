@@ -4,8 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "vite --mode staging",
+    "dev:prod": "vite --mode production",
+    "build": "tsc -b && vite build --mode staging",
+    "build:prod": "tsc -b && vite build --mode production",
+    "deploy:staging": "npm run build && firebase deploy --only hosting:staging",
+    "deploy:prod": "npm run build:prod && firebase deploy --only hosting:prod",
     "preview": "vite preview",
     "lint": "eslint ."
   },

@@ -4,6 +4,7 @@ import {
   AppBar,
   Avatar,
   Box,
+  Button,
   Divider,
   Drawer,
   IconButton,
@@ -14,6 +15,7 @@ import {
   Menu,
   MenuItem,
   Toolbar,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import {
@@ -24,6 +26,9 @@ import {
   Logout as LogoutIcon,
   FitnessCenter as GymIcon,
   StoreMallDirectory as GymSettingsIcon,
+  ContactPhone as EnquiriesIcon,
+  Receipt as ExpensesIcon,
+  SwapHoriz as SwitchIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '@/context/AuthContext';
@@ -35,6 +40,8 @@ const navItems = [
   { label: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { label: 'Members', icon: <PeopleIcon />, path: '/members' },
   { label: 'Gym', icon: <GymSettingsIcon />, path: '/gym' },
+  { label: 'Enquiries', icon: <EnquiriesIcon />, path: '/visitors' },
+  { label: 'Expenses', icon: <ExpensesIcon />, path: '/expenses' },
   { label: 'Reports', icon: <ReportsIcon />, path: '/reports' },
 ];
 
@@ -85,10 +92,16 @@ export default function AppShell() {
         ))}
       </List>
       <Divider />
-      <Box sx={{ p: 2 }}>
-        <Typography variant="body2" color="text.secondary" noWrap>
-          {gym?.subName}
-        </Typography>
+      <Box
+        sx={{ p: 2, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+        onClick={() => { navigate('/branches'); setMobileOpen(false); }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography variant="body2" color="text.secondary" noWrap>
+            {gym?.subName}
+          </Typography>
+          <SwitchIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+        </Box>
         <Typography variant="caption" color="text.secondary" noWrap>
           {gym?.admin?.email ?? gym?.email}
         </Typography>
@@ -141,6 +154,17 @@ export default function AppShell() {
               <MenuIcon />
             </IconButton>
             <Box sx={{ flex: 1 }} />
+            <Tooltip title="Switch Branch">
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<SwitchIcon />}
+                onClick={() => navigate('/branches')}
+                sx={{ mr: 1.5, textTransform: 'none', fontWeight: 600 }}
+              >
+                {gym?.subName ?? 'Select Branch'}
+              </Button>
+            </Tooltip>
             <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
               <Avatar
                 sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: 14 }}
@@ -153,6 +177,12 @@ export default function AppShell() {
               open={!!anchorEl}
               onClose={() => setAnchorEl(null)}
             >
+              <MenuItem onClick={() => { setAnchorEl(null); navigate('/branches'); }}>
+                <ListItemIcon>
+                  <SwitchIcon fontSize="small" />
+                </ListItemIcon>
+                Switch Branch
+              </MenuItem>
               <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
                   <LogoutIcon fontSize="small" />

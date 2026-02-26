@@ -16,6 +16,7 @@ import {
   FitnessCenter as PtIcon,
   PersonAdd as AdmissionIcon,
   Fingerprint as AttendanceIcon,
+  Download as DownloadIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import {
@@ -36,6 +37,7 @@ const reportCards = [
   { label: 'PT Plan Due Report', description: 'Personal training plan dues', icon: <PtIcon />, path: '/reports/pt-plan-due' },
   { label: 'Admission Report', description: 'Admission fee collection', icon: <AdmissionIcon />, path: '/reports/admission' },
   { label: 'Attendance Report', description: 'Daily punch-in/out records', icon: <AttendanceIcon />, path: '/reports/attendance' },
+  { label: 'Download Report', description: 'Export members & bills', icon: <DownloadIcon />, path: '/reports/download' },
 ];
 
 const TIME_PERIODS = [

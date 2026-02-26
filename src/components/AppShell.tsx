@@ -29,6 +29,7 @@ import {
   ContactPhone as EnquiriesIcon,
   Receipt as ExpensesIcon,
   SwapHoriz as SwitchIcon,
+  CardMembership as SubscriptionIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '@/context/AuthContext';
@@ -43,6 +44,8 @@ const navItems = [
   { label: 'Enquiries', icon: <EnquiriesIcon />, path: '/visitors' },
   { label: 'Expenses', icon: <ExpensesIcon />, path: '/expenses' },
   { label: 'Reports', icon: <ReportsIcon />, path: '/reports' },
+  { label: 'Subscription', icon: <SubscriptionIcon />, path: '/subscription' },
+  { label: 'Manage Branch', icon: <SwitchIcon />, path: '/branches' },
 ];
 
 export default function AppShell() {
@@ -92,20 +95,15 @@ export default function AppShell() {
         ))}
       </List>
       <Divider />
-      <Box
-        sx={{ p: 2, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-        onClick={() => { navigate('/branches'); setMobileOpen(false); }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="body2" color="text.secondary" noWrap>
-            {gym?.subName}
-          </Typography>
-          <SwitchIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-        </Box>
-        <Typography variant="caption" color="text.secondary" noWrap>
-          {gym?.admin?.email ?? gym?.email}
-        </Typography>
-      </Box>
+      <List sx={{ px: 1, pb: 1 }}>
+        <ListItemButton
+          onClick={() => { handleLogout(); setMobileOpen(false); }}
+          sx={{ borderRadius: 2 }}
+        >
+          <ListItemIcon sx={{ minWidth: 40 }}><LogoutIcon /></ListItemIcon>
+          <ListItemText primary="Logout" />
+        </ListItemButton>
+      </List>
     </Box>
   );
 
@@ -182,6 +180,12 @@ export default function AppShell() {
                   <SwitchIcon fontSize="small" />
                 </ListItemIcon>
                 Switch Branch
+              </MenuItem>
+              <MenuItem onClick={() => { setAnchorEl(null); navigate('/subscription'); }}>
+                <ListItemIcon>
+                  <SubscriptionIcon fontSize="small" />
+                </ListItemIcon>
+                Subscription
               </MenuItem>
               <MenuItem onClick={handleLogout}>
                 <ListItemIcon>

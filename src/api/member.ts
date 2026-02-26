@@ -107,6 +107,16 @@ export const admissionReportAPI = (params: {
 }) =>
   client.get('/member/admission-report', { params });
 
+export const downloadMemberExcelAPI = (fileContext: string, fileType: string) =>
+  client.get('/member/download/excel', { params: { fileContext, fileType } });
+
+export const downloadMemberBillsAPI = (params: {
+  startDate: string;
+  endDate: string;
+  fileType: string;
+}) =>
+  client.get('/member/member-invoices/download', { params });
+
 export const getAllUserAttendanceReportAPI = (params: {
   startDate: number;
   endDate: number;

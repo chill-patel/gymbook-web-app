@@ -24,6 +24,7 @@ import PlanReportPage from '@/pages/reports/PlanReportPage';
 import PtPlanReportPage from '@/pages/reports/PtPlanReportPage';
 import AdmissionReportPage from '@/pages/reports/AdmissionReportPage';
 import AttendanceReportPage from '@/pages/reports/AttendanceReportPage';
+import DownloadReportPage from '@/pages/reports/DownloadReportPage';
 import VisitorListPage from '@/pages/visitors/VisitorListPage';
 import AddVisitorPage from '@/pages/visitors/AddVisitorPage';
 import EditVisitorPage from '@/pages/visitors/EditVisitorPage';
@@ -31,6 +32,7 @@ import ExpenseListPage from '@/pages/expenses/ExpenseListPage';
 import AddExpensePage from '@/pages/expenses/AddExpensePage';
 import EditExpensePage from '@/pages/expenses/EditExpensePage';
 import BranchSelectPage from '@/pages/branches/BranchSelectPage';
+import SubscriptionPage from '@/pages/subscription/SubscriptionPage';
 
 function RedirectIfAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -83,6 +85,7 @@ function AppRoutes() {
         <Route path="/reports/pt-plan-due" element={<PtPlanReportPage />} />
         <Route path="/reports/admission" element={<AdmissionReportPage />} />
         <Route path="/reports/attendance" element={<AttendanceReportPage />} />
+        <Route path="/reports/download" element={<DownloadReportPage />} />
         <Route path="/visitors" element={<VisitorListPage />} />
         <Route path="/visitors/add" element={<AddVisitorPage />} />
         <Route path="/visitors/edit" element={<EditVisitorPage />} />
@@ -90,6 +93,7 @@ function AppRoutes() {
         <Route path="/expenses/add" element={<AddExpensePage />} />
         <Route path="/expenses/edit" element={<EditExpensePage />} />
         <Route path="/branches" element={<BranchSelectPage />} />
+        <Route path="/subscription" element={<SubscriptionPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

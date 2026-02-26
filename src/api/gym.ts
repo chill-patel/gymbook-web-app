@@ -46,6 +46,9 @@ export const getMemberCollectionAPI = (startDate: string, endDate: string) =>
     params: { startDate, endDate, apiVersion: 1 },
   });
 
+export const generatePaymentAuthTokenAPI = () =>
+  client.post('/subscriber/generate-temporary-payment-auth-token');
+
 export const editGymDetailAPI = (memberId: string, gymDetail: Partial<GymProfile>) =>
   client.put(`/subscriber/${memberId}`, gymDetail);
 

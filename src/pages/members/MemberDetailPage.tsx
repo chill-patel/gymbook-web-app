@@ -259,12 +259,13 @@ function SocialActions({
   member,
   onToast,
   onMemberUpdate,
+  onRenewPlan,
 }: {
   member: Member;
   onToast: (msg: string, severity: 'success' | 'error') => void;
   onMemberUpdate: (updated: Member) => void;
+  onRenewPlan: () => void;
 }) {
-  const navigate = useNavigate();
   const phoneNumber = member.mobile
     ? `+${member.callingCode || ''}${member.mobile}`
     : null;
@@ -290,7 +291,7 @@ function SocialActions({
   };
 
   const handleRenewPlan = () => {
-    navigate(`/members/${member._id}/add-package`);
+    onRenewPlan();
   };
 
   const handleBlock = async () => {
@@ -998,7 +999,7 @@ export default function MemberDetailPage() {
             <Card>
               <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                 <SectionTitle title="Quick Actions" />
-                <SocialActions member={member} onToast={handleToast} onMemberUpdate={setMember} />
+                <SocialActions member={member} onToast={handleToast} onMemberUpdate={setMember} onRenewPlan={() => setAddPlanOpen(true)} />
               </CardContent>
             </Card>
             <BiometricSection

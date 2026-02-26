@@ -14,6 +14,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { getAllPtPlansAPI } from '@/api/gym';
+import { getMemberPtPlansAPI } from '@/api/member';
 import type { Package } from '@/api/types';
 
 const PAYMENT_METHODS = ['Cash', 'Card', 'UPI', 'Online', 'Bank Transfer', 'Cheque'];
@@ -37,7 +38,7 @@ interface Props {
   memberId: string;
 }
 
-export default function AddPtPlanDialog({ open, onClose, onSave }: Props) {
+export default function AddPtPlanDialog({ open, onClose, onSave, memberId }: Props) {
   const [ptPlans, setPtPlans] = useState<Package[]>([]);
 
   const {
@@ -46,6 +47,7 @@ export default function AddPtPlanDialog({ open, onClose, onSave }: Props) {
     reset,
     watch,
     control,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -62,18 +64,37 @@ export default function AddPtPlanDialog({ open, onClose, onSave }: Props) {
 
   useEffect(() => {
     if (open) {
-      getAllPtPlansAPI().then((res) => setPtPlans(res.data ?? [])).catch(() => {});
+      const today = new Date().toISOString().slice(0, 10);
       reset({
         ptPlanID: '',
-        joiningDate: new Date().toISOString().slice(0, 10),
+        joiningDate: today,
         paid: '0',
         discount: '0',
         discountType: 'percent',
         paymentMethod: 'Cash',
         comment: '',
       });
+
+      getAllPtPlansAPI().then((res) => setPtPlans(res.data ?? [])).catch(() => {});
+
+      // Set start date to day after latest PT plan expiry (matching mobile)
+      if (memberId) {
+        getMemberPtPlansAPI(memberId).then((res) => {
+          const plans = res.data?.ptPlans ?? [];
+          if (plans.length > 0) {
+            const sorted = [...plans].sort(
+              (a, b) => new Date(b.expiryDate ?? 0).getTime() - new Date(a.expiryDate ?? 0).getTime(),
+            );
+            if (sorted[0]!.expiryDate) {
+              const latestExpiry = new Date(sorted[0]!.expiryDate);
+              latestExpiry.setDate(latestExpiry.getDate() + 1);
+              setValue('joiningDate', latestExpiry.toISOString().slice(0, 10));
+            }
+          }
+        }).catch(() => {});
+      }
     }
-  }, [open, reset]);
+  }, [open, reset, memberId, setValue]);
 
   const selectedPlanId = watch('ptPlanID');
   const paidVal = watch('paid');

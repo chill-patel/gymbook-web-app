@@ -14,6 +14,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { getAllPackagesAPI } from '@/api/gym';
+import { getMemberPackagesAPI } from '@/api/member';
 import type { Package } from '@/api/types';
 
 const PAYMENT_METHODS = ['Cash', 'Card', 'UPI', 'Online', 'Bank Transfer', 'Cheque'];
@@ -39,7 +40,7 @@ interface Props {
   memberId: string;
 }
 
-export default function AddPlanDialog({ open, onClose, onSave, memberId: _memberId }: Props) {
+export default function AddPlanDialog({ open, onClose, onSave, memberId }: Props) {
   const [packages, setPackages] = useState<Package[]>([]);
 
   const {
@@ -67,6 +68,19 @@ export default function AddPlanDialog({ open, onClose, onSave, memberId: _member
 
   useEffect(() => {
     if (open) {
+      const today = new Date().toISOString().slice(0, 10);
+      reset({
+        packageID: '',
+        joiningDate: today,
+        paid: '0',
+        discount: '0',
+        discountType: 'percent',
+        paymentMethod: 'Cash',
+        paymentDate: today,
+        comment: '',
+        admissionFees: '0',
+      });
+
       getAllPackagesAPI().then((res) => {
         const list = res.data ?? [];
         setPackages(list);
@@ -74,19 +88,23 @@ export default function AddPlanDialog({ open, onClose, onSave, memberId: _member
           setValue('packageID', list[0]!._id);
         }
       }).catch(() => {});
-      reset({
-        packageID: '',
-        joiningDate: new Date().toISOString().slice(0, 10),
-        paid: '0',
-        discount: '0',
-        discountType: 'percent',
-        paymentMethod: 'Cash',
-        paymentDate: new Date().toISOString().slice(0, 10),
-        comment: '',
-        admissionFees: '0',
-      });
+
+      // Set start date to day after latest plan expiry (matching mobile)
+      if (memberId) {
+        getMemberPackagesAPI(memberId).then((res) => {
+          const pkgs = res.data?.packages ?? [];
+          if (pkgs.length > 0) {
+            const sorted = [...pkgs].sort(
+              (a, b) => new Date(b.expiryDate).getTime() - new Date(a.expiryDate).getTime(),
+            );
+            const latestExpiry = new Date(sorted[0]!.expiryDate);
+            latestExpiry.setDate(latestExpiry.getDate() + 1);
+            setValue('joiningDate', latestExpiry.toISOString().slice(0, 10));
+          }
+        }).catch(() => {});
+      }
     }
-  }, [open, reset]);
+  }, [open, reset, memberId, setValue]);
 
   const selectedPkgId = watch('packageID');
   const paidVal = watch('paid');

@@ -1,7 +1,10 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const FALLBACK_URL = import.meta.env.VITE_API_FALLBACK_URL;
+const COOKIE_DOMAIN = import.meta.env.VITE_COOKIE_DOMAIN;
+const AUTH_COOKIE = 'authToken';
 
 const client = axios.create({
   baseURL: BASE_URL,
@@ -16,7 +19,7 @@ const client = axios.create({
 
 // Request interceptor — attach auth token
 client.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
+  const token = Cookies.get(AUTH_COOKIE);
   if (token) {
     config.headers.authToken = token;
   }
@@ -45,13 +48,23 @@ client.interceptors.response.use(
 
 export default client;
 
-// Token helpers
+// Token helpers — stored as a cookie on the root domain so all
+// *.gymbook.in subdomains share the same auth session.
 export const saveToken = (token: string) => {
-  localStorage.setItem('authToken', token);
+  Cookies.set(AUTH_COOKIE, token, {
+    domain: COOKIE_DOMAIN,
+    path: '/',
+    expires: 365,
+    secure: true,
+    sameSite: 'Lax',
+  });
 };
 
-export const getToken = () => localStorage.getItem('authToken');
+export const getToken = () => Cookies.get(AUTH_COOKIE);
 
 export const removeToken = () => {
-  localStorage.removeItem('authToken');
+  Cookies.remove(AUTH_COOKIE, {
+    domain: COOKIE_DOMAIN,
+    path: '/',
+  });
 };

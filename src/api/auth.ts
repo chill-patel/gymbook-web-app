@@ -30,3 +30,6 @@ export const deleteAccountAPI = (password: string) =>
 
 export const deleteGymBranchAPI = (password: string, subID: string) =>
   client.delete('/subscriber/branch', { data: { password, subID } });
+
+export const generateTempAuthTokenAPI = (key: string) =>
+  client.get<unknown, AuthResponse>(`/subscriber/generate-session-token?key=${key}`);

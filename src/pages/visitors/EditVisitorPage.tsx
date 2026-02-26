@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   CardContent,
-  Divider,
   FormControl,
   InputLabel,
   MenuItem,
@@ -16,12 +15,15 @@ import {
   Typography,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { ArrowBack as BackIcon, Save as SaveIcon } from '@mui/icons-material';
+import { Save as SaveIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router';
 import { getAllPackagesAPI } from '@/api/gym';
 import { updateVisitorAPI } from '@/api/visitor';
 import type { Package } from '@/api/types';
 import MuiPhoneInput from '@/components/MuiPhoneInput';
+import { formatDate } from '@/utils/format';
+import PageHeader from '@/components/PageHeader';
+import { Layout } from '@/theme';
 
 const LEAD_STATUSES = [
   'Initial Discussion',
@@ -46,13 +48,6 @@ interface VisitorData {
   fallowUpDate?: string;
   packages?: { _id?: string; name: string; price: number; month?: number };
   comments?: VisitorComment[] | null;
-}
-
-function formatCommentDate(dateStr?: string): string {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 function toDateInputValue(dateStr?: string): string {
@@ -162,7 +157,7 @@ export default function EditVisitorPage() {
 
   if (loading) {
     return (
-      <Box sx={{ maxWidth: 900, mx: 'auto' }}>
+      <Box sx={{ maxWidth: Layout.pageMaxWidthNarrow, mx: 'auto' }}>
         <Skeleton variant="rounded" height={40} width={150} sx={{ mb: 2 }} />
         <Skeleton variant="rounded" height={300} />
       </Box>
@@ -170,28 +165,22 @@ export default function EditVisitorPage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 900, mx: 'auto' }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Button startIcon={<BackIcon />} onClick={() => navigate('/visitors')}>
-            Back
+    <Box sx={{ maxWidth: Layout.pageMaxWidthNarrow, mx: 'auto' }}>
+      <PageHeader
+        title="Edit Enquiry"
+        backPath={true}
+        action={
+          <Button
+            variant="contained"
+            startIcon={<SaveIcon />}
+            disabled={saving}
+            onClick={handleSave}
+            size="large"
+          >
+            {saving ? 'Saving...' : 'Save'}
           </Button>
-          <Divider orientation="vertical" flexItem />
-          <Typography variant="h5" fontWeight={700}>
-            Edit Enquiry
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<SaveIcon />}
-          disabled={saving}
-          onClick={handleSave}
-          size="large"
-        >
-          {saving ? 'Saving...' : 'Save'}
-        </Button>
-      </Box>
+        }
+      />
 
       <Grid container spacing={3}>
         {/* Profile Section */}
@@ -299,7 +288,7 @@ export default function EditVisitorPage() {
                       <Typography variant="body2">{c.text}</Typography>
                       {c.createdAt && (
                         <Typography variant="caption" color="text.secondary">
-                          {formatCommentDate(c.createdAt)}
+                          {formatDate(c.createdAt)}
                         </Typography>
                       )}
                     </Box>

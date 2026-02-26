@@ -14,10 +14,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { ArrowBack as BackIcon } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useAuth } from '@/context/AuthContext';
 import { deleteAccountAPI, deleteGymBranchAPI } from '@/api/auth';
+import PageHeader from '@/components/PageHeader';
+import { Layout } from '@/theme';
 
 export default function DeleteAccountPage() {
   const navigate = useNavigate();
@@ -72,15 +73,8 @@ export default function DeleteAccountPage() {
     : 'Are you sure you want to permanently delete your account? All data will be lost and this cannot be undone.';
 
   return (
-    <Box sx={{ maxWidth: 500, mx: 'auto' }}>
-      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Button startIcon={<BackIcon />} onClick={() => navigate(-1)} sx={{ textTransform: 'none' }}>
-          Back
-        </Button>
-        <Typography variant="h5" fontWeight={700}>
-          {title}
-        </Typography>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidthNarrow, mx: 'auto' }}>
+      <PageHeader title={title} backPath={true} />
 
       <Card>
         <CardContent sx={{ p: 3 }}>

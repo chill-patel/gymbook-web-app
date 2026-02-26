@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  Card,
   CardContent,
   Chip,
   Dialog,
@@ -27,7 +26,10 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { getStaffListAPI, deleteStaffAPI } from '@/api/gym';
-import { Colors } from '@/theme';
+import { Colors, Layout } from '@/theme';
+import PageHeader from '@/components/PageHeader';
+import EmptyState from '@/components/EmptyState';
+import StripedCard from '@/components/StripedCard';
 
 const PERMISSION_LABELS: Record<string, string> = {
   ALL: 'All Access',
@@ -87,24 +89,16 @@ export default function StaffListPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 900, mx: 'auto' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h5" fontWeight={700}>
-            Staff Management
-          </Typography>
-          <Typography variant="body2" color="text.secondary" mt={0.25}>
-            Manage your gym team members and their permissions
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/gym/staff/add')}
-        >
-          Add Staff
-        </Button>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidth, mx: 'auto' }}>
+      <PageHeader
+        title="Staff Management"
+        subtitle="Manage your gym team members and their permissions"
+        action={
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/gym/staff/add')}>
+            Add Staff
+          </Button>
+        }
+      />
 
       {loading ? (
         <Grid container spacing={2}>
@@ -115,19 +109,15 @@ export default function StaffListPage() {
           ))}
         </Grid>
       ) : staff.length === 0 ? (
-        <Card>
-          <CardContent sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h6" color="text.secondary" mb={1}>
-              No team members found
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
-              Add staff members to help manage your gym
-            </Typography>
+        <EmptyState
+          title="No team members found"
+          description="Add staff members to help manage your gym"
+          action={
             <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/gym/staff/add')}>
               Add Staff
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <Grid container spacing={2}>
           {staff.map((member) => {
@@ -137,8 +127,7 @@ export default function StaffListPage() {
 
             return (
               <Grid key={member._id} size={{ xs: 12, sm: 6 }}>
-                <Card sx={{ display: 'flex', overflow: 'hidden', height: '100%' }}>
-                  <Box sx={{ width: 4, bgcolor: Colors.primary, flexShrink: 0 }} />
+                <StripedCard stripeColor={Colors.primary}>
                   <CardContent sx={{ flex: 1, p: 2.5, '&:last-child': { pb: 2.5 } }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -195,7 +184,7 @@ export default function StaffListPage() {
                       </Box>
                     )}
                   </CardContent>
-                </Card>
+                </StripedCard>
               </Grid>
             );
           })}

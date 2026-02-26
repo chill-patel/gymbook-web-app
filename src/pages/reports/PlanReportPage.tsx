@@ -1,22 +1,24 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
-  Button,
   Card,
   CardActionArea,
   CardContent,
   Divider,
-  LinearProgress,
   Skeleton,
   TextField,
   Typography,
 } from '@mui/material';
-import { ArrowBack as BackIcon } from '@mui/icons-material';
 import Grid from '@mui/material/Grid2';
 import { useNavigate, useSearchParams } from 'react-router';
 import { planReportAPI } from '@/api/member';
 import { getInitialDateRange, toInputDate, fromInputDate } from '@/config/dashboardFilter';
-import { Colors } from '@/theme';
+import { Colors, Layout } from '@/theme';
+import PageHeader from '@/components/PageHeader';
+import EmptyState from '@/components/EmptyState';
+import StripedCard from '@/components/StripedCard';
+import FilterToolbar from '@/components/FilterToolbar';
+import { formatDate } from '@/utils/format';
 
 interface PlanPackage {
   _id: string;
@@ -34,14 +36,6 @@ interface PlanMember {
   mobile?: string;
   callingCode?: string;
   packages: PlanPackage;
-}
-
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return '—';
-  const d = new Date(dateStr);
-  const day = String(d.getDate()).padStart(2, '0');
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 function formatMobile(mobile?: string, callingCode?: string): string {
@@ -83,19 +77,11 @@ export default function PlanReportPage() {
   }, [startDate, endDate, fetchData]);
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-        <Button startIcon={<BackIcon />} onClick={() => navigate(-1)} size="small">
-          Back
-        </Button>
-        <Typography variant="h5" fontWeight={700}>
-          Plan Due Report
-        </Typography>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidth, mx: 'auto' }}>
+      <PageHeader title="Plan Due Report" backPath={true} />
 
       {/* Date filters */}
-      <Card sx={{ mb: 2 }}>
-        <Box sx={{ p: 2, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+      <FilterToolbar loading={fetching}>
           <TextField
             label="Start Date"
             type="date"
@@ -112,9 +98,7 @@ export default function PlanReportPage() {
             onChange={(e) => setEndDate(fromInputDate(e.target.value, true))}
             slotProps={{ inputLabel: { shrink: true } }}
           />
-        </Box>
-        {fetching && <LinearProgress sx={{ height: 2 }} />}
-      </Card>
+      </FilterToolbar>
 
       {/* Summary bar */}
       <Card sx={{ mb: 3, bgcolor: Colors.secondary, color: '#fff' }}>
@@ -138,11 +122,7 @@ export default function PlanReportPage() {
           ))}
         </Grid>
       ) : members.length === 0 ? (
-        <Card>
-          <CardContent sx={{ textAlign: 'center', py: 6 }}>
-            <Typography color="text.secondary">No plan dues found.</Typography>
-          </CardContent>
-        </Card>
+        <EmptyState title="No plan dues found" />
       ) : (
         <Grid container spacing={2}>
           {members.map((member) => {
@@ -151,9 +131,7 @@ export default function PlanReportPage() {
 
             return (
               <Grid key={member._id} size={{ xs: 12, sm: 6, md: 4 }}>
-                <Card sx={{ display: 'flex', overflow: 'hidden', height: '100%' }}>
-                  <Box sx={{ width: 4, bgcolor: Colors.financial.due, flexShrink: 0 }} />
-                  <Box sx={{ flex: 1 }}>
+                <StripedCard stripeColor={Colors.financial.due}>
                     <CardActionArea
                       onClick={() => navigate(`/members/${member._id}`)}
                       sx={{ height: '100%' }}
@@ -189,8 +167,7 @@ export default function PlanReportPage() {
                         </Box>
                       </CardContent>
                     </CardActionArea>
-                  </Box>
-                </Card>
+                </StripedCard>
               </Grid>
             );
           })}

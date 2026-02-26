@@ -17,12 +17,11 @@ import {
   Typography,
 } from '@mui/material';
 import {
-  ArrowBack as BackIcon,
   Download as DownloadIcon,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router';
 import { downloadMemberExcelAPI, downloadMemberBillsAPI } from '@/api/member';
-import { Colors } from '@/theme';
+import { Colors, Layout } from '@/theme';
+import PageHeader from '@/components/PageHeader';
 
 const MEMBER_FILTERS = [
   { label: 'All Members', value: 'totalRegUser' },
@@ -45,7 +44,6 @@ function getDefaultDateRange() {
 }
 
 export default function DownloadReportPage() {
-  const navigate = useNavigate();
   const { startStr, endStr } = getDefaultDateRange();
 
   const [reportType, setReportType] = useState<'member' | 'bill'>('member');
@@ -86,16 +84,8 @@ export default function DownloadReportPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 700, mx: 'auto' }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <Button startIcon={<BackIcon />} onClick={() => navigate('/reports')} size="small">
-          Back
-        </Button>
-        <Typography variant="h5" fontWeight={700}>
-          Download Report
-        </Typography>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidthNarrow, mx: 'auto' }}>
+      <PageHeader title="Download Report" backPath="/reports" />
 
       {/* Info card */}
       <Card sx={{ mb: 3, bgcolor: `${Colors.primary}08`, borderLeft: `4px solid ${Colors.primary}` }}>

@@ -9,13 +9,12 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { ArrowBack as BackIcon } from '@mui/icons-material';
-import { useNavigate } from 'react-router';
 import { useAuth } from '@/context/AuthContext';
 import { forgetPasswordAPI } from '@/api/auth';
+import PageHeader from '@/components/PageHeader';
+import { Layout } from '@/theme';
 
 export default function ForgotPasswordPage() {
-  const navigate = useNavigate();
   const { gym } = useAuth();
   const [email, setEmail] = useState(gym?.admin?.email ?? gym?.email ?? '');
   const [loading, setLoading] = useState(false);
@@ -38,15 +37,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 500, mx: 'auto' }}>
-      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Button startIcon={<BackIcon />} onClick={() => navigate(-1)} sx={{ textTransform: 'none' }}>
-          Back
-        </Button>
-        <Typography variant="h5" fontWeight={700}>
-          Forgot Password
-        </Typography>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidthNarrow, mx: 'auto' }}>
+      <PageHeader title="Forgot Password" backPath={true} />
 
       <Card>
         <CardContent sx={{ p: 3 }}>

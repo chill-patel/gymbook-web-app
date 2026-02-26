@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
-  Button,
   Card,
   CardActionArea,
   CardContent,
@@ -13,7 +12,6 @@ import {
   Typography,
   InputAdornment,
 } from '@mui/material';
-import { ArrowBack as BackIcon } from '@mui/icons-material';
 import Grid from '@mui/material/Grid2';
 import {
   ChevronLeft as PrevIcon,
@@ -25,7 +23,11 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { getAllUserAttendanceReportAPI } from '@/api/member';
-import { Colors } from '@/theme';
+import { Colors, Layout } from '@/theme';
+import PageHeader from '@/components/PageHeader';
+import EmptyState from '@/components/EmptyState';
+import StripedCard from '@/components/StripedCard';
+import StatusChip from '@/components/StatusChip';
 
 interface AttendanceItem {
   date: string;
@@ -109,15 +111,8 @@ export default function AttendanceReportPage() {
   });
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-        <Button startIcon={<BackIcon />} onClick={() => navigate(-1)} size="small">
-          Back
-        </Button>
-        <Typography variant="h5" fontWeight={700}>
-          Attendance Report
-        </Typography>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidth, mx: 'auto' }}>
+      <PageHeader title="Attendance Report" backPath={true} />
 
       {/* Day navigation */}
       <Card sx={{ mb: 2 }}>
@@ -221,20 +216,12 @@ export default function AttendanceReportPage() {
           ))}
         </Grid>
       ) : filtered.length === 0 ? (
-        <Card>
-          <CardContent sx={{ textAlign: 'center', py: 6 }}>
-            <Typography color="text.secondary">
-              {records.length === 0 ? 'No attendance records for this date.' : 'No matching records found.'}
-            </Typography>
-          </CardContent>
-        </Card>
+        <EmptyState title={records.length === 0 ? 'No attendance records for this date.' : 'No matching records found.'} />
       ) : (
         <Grid container spacing={2}>
           {filtered.map((rec, idx) => (
             <Grid key={rec.memberId ?? idx} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Card sx={{ display: 'flex', overflow: 'hidden', height: '100%' }}>
-                <Box sx={{ width: 4, bgcolor: rec.isActive ? Colors.status.active : Colors.status.expired, flexShrink: 0 }} />
-                <Box sx={{ flex: 1 }}>
+              <StripedCard stripeColor={rec.isActive ? Colors.status.active : Colors.status.expired}>
                   <CardActionArea
                     onClick={() => rec.memberId && navigate(`/members/${rec.memberId}`)}
                     sx={{ height: '100%' }}
@@ -244,17 +231,7 @@ export default function AttendanceReportPage() {
                         <Typography variant="body1" fontWeight={600} noWrap sx={{ flex: 1 }}>
                           {rec.memberName ?? '—'}
                         </Typography>
-                        <Chip
-                          label={rec.isActive ? 'Active' : 'Expired'}
-                          size="small"
-                          sx={{
-                            bgcolor: rec.isActive ? '#e8f5e9' : '#ffebee',
-                            color: rec.isActive ? Colors.status.active : Colors.status.expired,
-                            fontWeight: 600,
-                            fontSize: 11,
-                            height: 22,
-                          }}
-                        />
+                        <StatusChip label={rec.isActive ? 'Active' : 'Expired'} color={rec.isActive ? Colors.status.active : Colors.status.expired} />
                       </Box>
                       <Box sx={{ display: 'flex', gap: 3 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -268,8 +245,7 @@ export default function AttendanceReportPage() {
                       </Box>
                     </CardContent>
                   </CardActionArea>
-                </Box>
-              </Card>
+              </StripedCard>
             </Grid>
           ))}
         </Grid>

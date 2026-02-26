@@ -3,14 +3,11 @@ import {
   Alert,
   Box,
   Button,
-  Card,
   CardContent,
-  Chip,
   FormControl,
   IconButton,
   InputAdornment,
   InputLabel,
-  LinearProgress,
   MenuItem,
   Select,
   Skeleton,
@@ -33,7 +30,13 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { getVisitorsAPI, deleteVisitorAPI } from '@/api/visitor';
-import { Colors } from '@/theme';
+import { Colors, Layout } from '@/theme';
+import { formatDate } from '@/utils/format';
+import PageHeader from '@/components/PageHeader';
+import EmptyState from '@/components/EmptyState';
+import StatusChip from '@/components/StatusChip';
+import StripedCard from '@/components/StripedCard';
+import FilterToolbar from '@/components/FilterToolbar';
 
 const PAGE_SIZE = 40;
 
@@ -80,13 +83,6 @@ interface Visitor {
   comments?: VisitorComment[] | null;
   createdAt?: string;
   updatedAt?: string;
-}
-
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 function formatMobile(mobile?: string, callingCode?: string): string {
@@ -171,33 +167,18 @@ export default function VisitorListPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h5" fontWeight={700}>
-            Enquiries
-          </Typography>
-          {!loading && (
-            <Typography variant="body2" color="text.secondary" mt={0.25}>
-              {visitors.length > 0
-                ? `Showing ${page * PAGE_SIZE + 1}–${page * PAGE_SIZE + visitors.length}`
-                : 'No enquiries'}
-            </Typography>
-          )}
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/visitors/add')}
-        >
-          Add Enquiry
-        </Button>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidth, mx: 'auto' }}>
+      <PageHeader
+        title="Enquiries"
+        subtitle={!loading ? (visitors.length > 0 ? `Showing ${page * PAGE_SIZE + 1}–${page * PAGE_SIZE + visitors.length}` : 'No enquiries') : undefined}
+        action={
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/visitors/add')}>
+            Add Enquiry
+          </Button>
+        }
+      />
 
-      {/* Toolbar */}
-      <Card sx={{ mb: 3 }}>
-        <Box sx={{ p: 2, display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+      <FilterToolbar loading={fetching}>
           <TextField
             placeholder="Search by name, mobile..."
             size="small"
@@ -237,9 +218,7 @@ export default function VisitorListPage() {
               ))}
             </Select>
           </FormControl>
-        </Box>
-        {fetching && <LinearProgress sx={{ height: 2 }} />}
-      </Card>
+      </FilterToolbar>
 
       {/* Visitor list */}
       {loading ? (
@@ -251,18 +230,10 @@ export default function VisitorListPage() {
           ))}
         </Grid>
       ) : visitors.length === 0 && !fetching ? (
-        <Card>
-          <CardContent sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h6" color="text.secondary" mb={1}>
-              No enquiries found
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {debouncedQuery || leadStatus
-                ? 'Try adjusting your search or filters'
-                : 'No visitor enquiries yet'}
-            </Typography>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No enquiries found"
+          description={debouncedQuery || leadStatus ? 'Try adjusting your search or filters' : 'No visitor enquiries yet'}
+        />
       ) : (
         <>
           <Grid
@@ -277,9 +248,7 @@ export default function VisitorListPage() {
 
               return (
                 <Grid key={v._id} size={{ xs: 12, sm: 6, md: 4 }}>
-                  <Card sx={{ display: 'flex', overflow: 'hidden', height: '100%' }}>
-                    <Box sx={{ width: 4, bgcolor: statusColor, flexShrink: 0 }} />
-                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <StripedCard stripeColor={statusColor}>
                       <CardContent sx={{ flex: 1, p: 2, '&:last-child': { pb: 1.5 } }}>
                         {/* Name + status */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -287,17 +256,7 @@ export default function VisitorListPage() {
                             {v.name}
                           </Typography>
                           {v.leadStatus && (
-                            <Chip
-                              label={v.leadStatus}
-                              size="small"
-                              sx={{
-                                bgcolor: `${statusColor}1A`,
-                                color: statusColor,
-                                fontWeight: 600,
-                                fontSize: 11,
-                                height: 22,
-                              }}
-                            />
+                            <StatusChip label={v.leadStatus} color={statusColor} />
                           )}
                         </Box>
 
@@ -360,8 +319,7 @@ export default function VisitorListPage() {
                           </IconButton>
                         </Tooltip>
                       </Box>
-                    </Box>
-                  </Card>
+                  </StripedCard>
                 </Grid>
               );
             })}

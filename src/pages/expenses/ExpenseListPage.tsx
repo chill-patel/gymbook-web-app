@@ -5,11 +5,9 @@ import {
   Button,
   Card,
   CardContent,
-  Chip,
   FormControl,
   IconButton,
   InputLabel,
-  LinearProgress,
   MenuItem,
   Select,
   Skeleton,
@@ -28,7 +26,13 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { getExpensesAPI, getExpenseCategoriesAPI, deleteExpenseAPI } from '@/api/expense';
-import { Colors } from '@/theme';
+import { Colors, Layout } from '@/theme';
+import { formatDate } from '@/utils/format';
+import PageHeader from '@/components/PageHeader';
+import EmptyState from '@/components/EmptyState';
+import StatusChip from '@/components/StatusChip';
+import StripedCard from '@/components/StripedCard';
+import FilterToolbar from '@/components/FilterToolbar';
 
 interface Expense {
   _id: string;
@@ -38,13 +42,6 @@ interface Expense {
   expenseDate: string;
   createdAt?: string;
   updatedAt?: string;
-}
-
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 const categoryColorMap: Record<string, string> = {
@@ -124,24 +121,17 @@ export default function ExpenseListPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" fontWeight={700}>
-          Expenses
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/expenses/add', { state: { categories } })}
-        >
-          Add Expense
-        </Button>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidth, mx: 'auto' }}>
+      <PageHeader
+        title="Expenses"
+        action={
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/expenses/add', { state: { categories } })}>
+            Add Expense
+          </Button>
+        }
+      />
 
-      {/* Filters */}
-      <Card sx={{ mb: 2 }}>
-        <Box sx={{ p: 2, display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+      <FilterToolbar loading={fetching}>
           <FormControl size="small" sx={{ minWidth: 200 }}>
             <InputLabel>Category</InputLabel>
             <Select
@@ -176,9 +166,7 @@ export default function ExpenseListPage() {
               Clear Dates
             </Button>
           )}
-        </Box>
-        {fetching && <LinearProgress sx={{ height: 2 }} />}
-      </Card>
+      </FilterToolbar>
 
       {/* Summary */}
       <Card sx={{ mb: 3, bgcolor: Colors.secondary, color: '#fff' }}>
@@ -202,18 +190,10 @@ export default function ExpenseListPage() {
           ))}
         </Grid>
       ) : expenses.length === 0 && !fetching ? (
-        <Card>
-          <CardContent sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h6" color="text.secondary" mb={1}>
-              No expenses found
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {selectedCategory || startDate || endDate
-                ? 'Try adjusting your filters'
-                : 'No expenses recorded yet'}
-            </Typography>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No expenses found"
+          description={selectedCategory || startDate || endDate ? 'Try adjusting your filters' : 'No expenses recorded yet'}
+        />
       ) : (
         <Grid
           container
@@ -224,9 +204,7 @@ export default function ExpenseListPage() {
             const catColor = getCategoryColor(e.category);
             return (
               <Grid key={e._id} size={{ xs: 12, sm: 6, md: 4 }}>
-                <Card sx={{ display: 'flex', overflow: 'hidden', height: '100%' }}>
-                  <Box sx={{ width: 4, bgcolor: catColor, flexShrink: 0 }} />
-                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <StripedCard stripeColor={catColor}>
                     <CardContent sx={{ flex: 1, p: 2, '&:last-child': { pb: 1.5 } }}>
                       {/* Header: desc + amount */}
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
@@ -242,17 +220,7 @@ export default function ExpenseListPage() {
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                           <CategoryIcon sx={{ fontSize: 15, color: 'text.disabled' }} />
-                          <Chip
-                            label={e.category}
-                            size="small"
-                            sx={{
-                              bgcolor: `${catColor}1A`,
-                              color: catColor,
-                              fontWeight: 600,
-                              fontSize: 11,
-                              height: 22,
-                            }}
-                          />
+                          <StatusChip label={e.category} color={catColor} />
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                           <DateIcon sx={{ fontSize: 15, color: 'text.disabled' }} />
@@ -280,8 +248,7 @@ export default function ExpenseListPage() {
                         </IconButton>
                       </Tooltip>
                     </Box>
-                  </Box>
-                </Card>
+                </StripedCard>
               </Grid>
             );
           })}

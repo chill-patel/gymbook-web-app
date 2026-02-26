@@ -39,6 +39,12 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { getAllMembersAPI, punchInOutAPI } from '@/api/member';
 import { getAllPackagesAPI, getAllBatchesAPI } from '@/api/gym';
 import type { Member, Package, Batch } from '@/api/types';
+import { formatDate } from '@/utils/format';
+import { Layout } from '@/theme';
+import PageHeader from '@/components/PageHeader';
+import EmptyState from '@/components/EmptyState';
+import StatusChip from '@/components/StatusChip';
+import StripedCard from '@/components/StripedCard';
 
 const PAGE_SIZE = 40;
 
@@ -87,12 +93,6 @@ function getStatusLabel(membershipExpiryDate?: string): string {
   return 'Active';
 }
 
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-}
-
 // ─── Mobile Member Card ──────────────────────────────────
 
 function MemberCard({ member, onClick, onAttendance }: { member: Member; onClick: () => void; onAttendance: (m: Member) => void }) {
@@ -124,9 +124,7 @@ function MemberCard({ member, onClick, onAttendance }: { member: Member; onClick
   };
 
   return (
-    <Card sx={{ display: 'flex', overflow: 'hidden', height: '100%' }}>
-      <Box sx={{ width: 5, bgcolor: stripColor, flexShrink: 0 }} />
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+    <StripedCard stripeColor={stripColor}>
         <CardActionArea
           onClick={onClick}
           sx={{ flex: 1, display: 'flex', alignItems: 'stretch' }}
@@ -152,17 +150,7 @@ function MemberCard({ member, onClick, onAttendance }: { member: Member; onClick
                   </Box>
                 )}
               </Box>
-              <Chip
-                label={statusLabel}
-                size="small"
-                sx={{
-                  bgcolor: `${stripColor}1A`,
-                  color: stripColor,
-                  fontWeight: 600,
-                  fontSize: 11,
-                  height: 24,
-                }}
-              />
+              <StatusChip label={statusLabel} color={stripColor} />
             </Box>
 
             <Divider sx={{ mb: 1.5 }} />
@@ -219,8 +207,7 @@ function MemberCard({ member, onClick, onAttendance }: { member: Member; onClick
             </IconButton>
           </Tooltip>
         </Box>
-      </Box>
-    </Card>
+    </StripedCard>
   );
 }
 
@@ -330,33 +317,19 @@ export default function MemberListPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h5" fontWeight={700}>
-            Members
-          </Typography>
-          {!initialLoad && (
-            <Typography variant="body2" color="text.secondary" mt={0.25}>
-              {members.length > 0
-                ? `Showing ${page * PAGE_SIZE + 1}–${page * PAGE_SIZE + members.length} members`
-                : 'No results'}
-            </Typography>
-          )}
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/members/add')}
-          size="large"
-        >
-          Add Member
-        </Button>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidth, mx: 'auto' }}>
+      <PageHeader
+        title="Members"
+        subtitle={!initialLoad ? (members.length > 0 ? `Showing ${page * PAGE_SIZE + 1}–${page * PAGE_SIZE + members.length} members` : 'No results') : undefined}
+        action={
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/members/add')} size="large">
+            Add Member
+          </Button>
+        }
+      />
 
       {/* Toolbar: search + filters inline on desktop */}
-      <Card sx={{ mb: 3 }}>
+      <Card sx={{ mb: Layout.sectionSpacing }}>
         <Box sx={{ p: 2, display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
           <TextField
             placeholder="Search by name, mobile, email..."
@@ -503,21 +476,15 @@ export default function MemberListPage() {
           ))}
         </Grid>
       ) : members.length === 0 && !fetching ? (
-        <Card>
-          <CardContent sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h6" color="text.secondary" mb={1}>
-              No members found
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={3}>
-              {debouncedQuery || activeFilterCount > 0
-                ? 'Try adjusting your search or filters'
-                : 'Add your first member to get started'}
-            </Typography>
+        <EmptyState
+          title="No members found"
+          description={debouncedQuery || activeFilterCount > 0 ? 'Try adjusting your search or filters' : 'Add your first member to get started'}
+          action={
             <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/members/add')}>
               Add Member
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <>
           <Grid

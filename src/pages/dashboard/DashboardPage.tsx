@@ -24,8 +24,9 @@ import {
 import { useNavigate } from 'react-router';
 import { getMemberAnalyticsAPI } from '@/api/gym';
 import type { AnalyticsSection, AnalyticsStat } from '@/api/types';
-import { Colors } from '@/theme';
+import { Colors, Layout } from '@/theme';
 import { reportMapping, memberContextMap } from '@/config/dashboardFilter';
+import PageHeader from '@/components/PageHeader';
 
 // Map server icon names to MUI icons
 const iconMap: Record<string, React.ReactNode> = {
@@ -134,10 +135,8 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <Box>
-        <Typography variant="h5" fontWeight={700} mb={3}>
-          Dashboard
-        </Typography>
+      <Box sx={{ maxWidth: Layout.pageMaxWidth, mx: 'auto' }}>
+        <PageHeader title="Dashboard" />
         {[1, 2, 3].map((s) => (
           <Box key={s} mb={3}>
             <Skeleton variant="text" width={180} height={32} sx={{ mb: 1 }} />
@@ -155,14 +154,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <Box>
-      <Typography variant="h5" fontWeight={700} mb={3}>
-        Dashboard
-      </Typography>
+    <Box sx={{ maxWidth: Layout.pageMaxWidth, mx: 'auto' }}>
+      <PageHeader title="Dashboard" />
 
       {sections.map((section) => (
         <Box key={section.header} mb={3}>
-          <Typography variant="h6" fontWeight={700} color="#444" mb={1.5}>
+          <Typography variant="h6" fontWeight={700} color="text.secondary" mb={1.5}>
             {section.header}
           </Typography>
           <Grid container spacing={1.5}>

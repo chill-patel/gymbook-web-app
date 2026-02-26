@@ -11,10 +11,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { ArrowBack as BackIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router';
 import { updateStaffAPI } from '@/api/gym';
 import MuiPhoneInput from '@/components/MuiPhoneInput';
+import PageHeader from '@/components/PageHeader';
+import { Layout } from '@/theme';
 
 const PERMISSIONS = [
   { value: 'ALL', label: 'Allow All Access' },
@@ -103,15 +104,8 @@ export default function EditStaffPage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto' }}>
-      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Button startIcon={<BackIcon />} onClick={() => navigate('/gym/staff')} sx={{ textTransform: 'none' }}>
-          Back
-        </Button>
-        <Typography variant="h5" fontWeight={700}>
-          Edit Staff Member
-        </Typography>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidthNarrow, mx: 'auto' }}>
+      <PageHeader title="Edit Staff" backPath={true} />
 
       <Card sx={{ mb: 2 }}>
         <CardContent sx={{ p: 3 }}>

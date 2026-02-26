@@ -14,7 +14,9 @@ import { ShoppingCart as PurchaseIcon } from '@mui/icons-material';
 import { getActiveSubscriptionAPI } from '@/api/payment';
 import { generatePaymentAuthTokenAPI } from '@/api/gym';
 import { useAuth } from '@/context/AuthContext';
-import { Colors } from '@/theme';
+import { Colors, Layout } from '@/theme';
+import PageHeader from '@/components/PageHeader';
+import EmptyState from '@/components/EmptyState';
 
 const PAYMENT_BASE = 'https://devpayments.gymbook.in';
 
@@ -74,15 +76,11 @@ export default function SubscriptionPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 1000, mx: 'auto' }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight={700}>
-          Subscription
-        </Typography>
-        <Typography variant="body2" color="text.secondary" mt={0.25}>
-          Manage your gym subscription plans
-        </Typography>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidth, mx: 'auto' }}>
+      <PageHeader
+        title="Subscription"
+        subtitle="Manage your gym subscription plans"
+      />
 
       {loading ? (
         <Grid container spacing={3}>
@@ -93,16 +91,10 @@ export default function SubscriptionPage() {
           ))}
         </Grid>
       ) : plans.length === 0 ? (
-        <Card>
-          <CardContent sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h6" color="text.secondary" mb={1}>
-              No subscription plans available
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Please check back later for available plans.
-            </Typography>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No subscription plans available"
+          description="Please check back later for available plans."
+        />
       ) : (
         <Grid container spacing={3}>
           {plans.map((plan) => (

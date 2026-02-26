@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   CardContent,
-  Divider,
   FormControl,
   InputLabel,
   MenuItem,
@@ -13,12 +12,13 @@ import {
   Skeleton,
   Snackbar,
   TextField,
-  Typography,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { ArrowBack as BackIcon, Save as SaveIcon } from '@mui/icons-material';
+import { Save as SaveIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router';
 import { addExpenseAPI, getExpenseCategoriesAPI } from '@/api/expense';
+import PageHeader from '@/components/PageHeader';
+import { Layout } from '@/theme';
 
 export default function AddExpensePage() {
   const navigate = useNavigate();
@@ -87,7 +87,7 @@ export default function AddExpensePage() {
 
   if (loading) {
     return (
-      <Box sx={{ maxWidth: 700, mx: 'auto' }}>
+      <Box sx={{ maxWidth: Layout.pageMaxWidthNarrow, mx: 'auto' }}>
         <Skeleton variant="rounded" height={40} width={150} sx={{ mb: 2 }} />
         <Skeleton variant="rounded" height={300} />
       </Box>
@@ -95,28 +95,22 @@ export default function AddExpensePage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 700, mx: 'auto' }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Button startIcon={<BackIcon />} onClick={() => navigate('/expenses')}>
-            Back
+    <Box sx={{ maxWidth: Layout.pageMaxWidthNarrow, mx: 'auto' }}>
+      <PageHeader
+        title="Add Expense"
+        backPath={true}
+        action={
+          <Button
+            variant="contained"
+            startIcon={<SaveIcon />}
+            disabled={saving}
+            onClick={handleSave}
+            size="large"
+          >
+            {saving ? 'Saving...' : 'Save'}
           </Button>
-          <Divider orientation="vertical" flexItem />
-          <Typography variant="h5" fontWeight={700}>
-            Add Expense
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<SaveIcon />}
-          disabled={saving}
-          onClick={handleSave}
-          size="large"
-        >
-          {saving ? 'Saving...' : 'Save'}
-        </Button>
-      </Box>
+        }
+      />
 
       <Card>
         <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>

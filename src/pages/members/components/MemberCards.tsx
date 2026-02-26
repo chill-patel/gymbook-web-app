@@ -1,8 +1,6 @@
 import {
   Box,
-  Card,
   CardContent,
-  Chip,
   Divider,
   IconButton,
   Tooltip,
@@ -12,19 +10,17 @@ import {
   Receipt as InvoiceIcon,
   Delete as DeleteIcon,
   Payment as PaymentIcon,
-  AcUnit as FreezeIcon,
   Edit as EditIcon,
   Share as ShareIcon,
 } from '@mui/icons-material';
 import type { MemberPackage, MemberPtPlan, MemberService, MemberInvoice } from '@/api/types';
+import { formatDate } from '@/utils/format';
+import StripedCard from '@/components/StripedCard';
+import StatusChip from '@/components/StatusChip';
 
 // ─── Helpers ─────────────────────────────────────────────
 
-export function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-}
+export { formatDate };
 
 export function getStripColor(expiryDate?: string): string {
   if (!expiryDate) return '#E0E0E0';
@@ -57,8 +53,7 @@ export function PlanCard({
   const payments = pkg.invoices ?? [];
 
   return (
-    <Card sx={{ display: 'flex', overflow: 'hidden' }}>
-      <Box sx={{ width: 4, bgcolor: stripColor, flexShrink: 0 }} />
+    <StripedCard stripeColor={stripColor}>
       <CardContent sx={{ flex: 1, p: 2.5, '&:last-child': { pb: 2.5 } }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
           <Box>
@@ -73,11 +68,7 @@ export function PlanCard({
             </Box>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Chip
-              label={statusLabel}
-              size="small"
-              sx={{ bgcolor: `${stripColor}1A`, color: stripColor, fontWeight: 600, fontSize: 11, height: 22 }}
-            />
+            <StatusChip label={statusLabel} color={stripColor} />
             <Tooltip title="Add Payment">
               <IconButton size="small" onClick={onAddPayment} sx={{ color: 'primary.main' }}>
                 <PaymentIcon fontSize="small" />
@@ -174,7 +165,7 @@ export function PlanCard({
           </Box>
         )}
       </CardContent>
-    </Card>
+    </StripedCard>
   );
 }
 
@@ -200,8 +191,7 @@ export function PtPlanCard({
   const isFrozen = !!plan.freezeStatus;
 
   return (
-    <Card sx={{ display: 'flex', overflow: 'hidden' }}>
-      <Box sx={{ width: 4, bgcolor: isFrozen ? '#42A5F5' : stripColor, flexShrink: 0 }} />
+    <StripedCard stripeColor={isFrozen ? '#42A5F5' : stripColor}>
       <CardContent sx={{ flex: 1, p: 2.5, '&:last-child': { pb: 2.5 } }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
           <Box>
@@ -219,18 +209,9 @@ export function PtPlanCard({
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             {isFrozen && (
-              <Chip
-                icon={<FreezeIcon sx={{ fontSize: 13 }} />}
-                label="Frozen"
-                size="small"
-                sx={{ bgcolor: '#42A5F51A', color: '#42A5F5', fontWeight: 600, fontSize: 11, height: 22 }}
-              />
+              <StatusChip label="Frozen" color="#42A5F5" />
             )}
-            <Chip
-              label={statusLabel}
-              size="small"
-              sx={{ bgcolor: `${stripColor}1A`, color: stripColor, fontWeight: 600, fontSize: 11, height: 22 }}
-            />
+            <StatusChip label={statusLabel} color={stripColor} />
             <Tooltip title="Add Payment">
               <IconButton size="small" onClick={onAddPayment} sx={{ color: 'primary.main' }}>
                 <PaymentIcon fontSize="small" />
@@ -364,7 +345,7 @@ export function PtPlanCard({
           </Box>
         )}
       </CardContent>
-    </Card>
+    </StripedCard>
   );
 }
 
@@ -380,8 +361,7 @@ export function ServiceCardItem({
   onEdit?: () => void;
 }) {
   return (
-    <Card sx={{ display: 'flex', overflow: 'hidden' }}>
-      <Box sx={{ width: 4, bgcolor: '#7B1FA2', flexShrink: 0 }} />
+    <StripedCard stripeColor="#7B1FA2">
       <CardContent sx={{ flex: 1, p: 2.5, '&:last-child': { pb: 2.5 } }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
@@ -449,6 +429,6 @@ export function ServiceCardItem({
           </Box>
         )}
       </CardContent>
-    </Card>
+    </StripedCard>
   );
 }

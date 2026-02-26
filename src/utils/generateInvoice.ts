@@ -1,10 +1,5 @@
 import type { GymProfile, MemberInvoice } from '@/api/types';
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-}
+import { formatDate } from '@/utils/format';
 
 interface InvoiceData {
   invoice: MemberInvoice;

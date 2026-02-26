@@ -83,7 +83,8 @@ import EditProfileDialog from './dialogs/EditProfileDialog';
 import EditPlanDialog from './dialogs/EditPlanDialog';
 import EditPtPlanDialog from './dialogs/EditPtPlanDialog';
 import EditServiceDialog from './dialogs/EditServiceDialog';
-import { PlanCard, PtPlanCard, ServiceCardItem, formatDate } from './components/MemberCards';
+import { PlanCard, PtPlanCard, ServiceCardItem } from './components/MemberCards';
+import { formatDate } from '@/utils/format';
 
 // ─── Helpers ─────────────────────────────────────────────
 
@@ -371,12 +372,6 @@ function BatchSection({ batch }: { batch?: Member['batch'] }) {
 
 // ─── Attendance Section ──────────────────────────────────
 
-function formatAttendanceDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
-}
-
 function formatTime(dateStr?: string): string {
   if (!dateStr) return '--:--';
   const d = new Date(dateStr);
@@ -449,7 +444,7 @@ function AttendanceSection({ memberId }: { memberId: string }) {
                 <Box sx={{ display: 'flex', alignItems: 'center', py: 1, gap: 2.5 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 130 }}>
                     <CalendarIcon sx={{ fontSize: 15, color: 'text.disabled' }} />
-                    <Typography variant="body2" fontWeight={500}>{formatAttendanceDate(r.date)}</Typography>
+                    <Typography variant="body2" fontWeight={500}>{formatDate(r.date)}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <EntryIcon sx={{ fontSize: 14, color: '#4CAF50' }} />

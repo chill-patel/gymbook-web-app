@@ -6,21 +6,20 @@ import {
   Typography,
 } from '@mui/material';
 import {
-  ArrowBack as BackIcon,
   OndemandVideo as VideoIcon,
   WhatsApp as WhatsAppIcon,
   Email as EmailIcon,
   Phone as PhoneIcon,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router';
 import { useAuth } from '@/context/AuthContext';
+import PageHeader from '@/components/PageHeader';
+import { Layout } from '@/theme';
 
 const WHATSAPP_NUMBER = '8169102340';
 const EMAIL_ADDRESS = 'help@gymbook.in';
 const VIDEO_TUTORIAL_URL = 'https://learn.gymbook.in';
 
 export default function HelpPage() {
-  const navigate = useNavigate();
   const { gym } = useAuth();
   const email = gym?.admin?.email ?? gym?.email ?? '';
 
@@ -30,15 +29,8 @@ export default function HelpPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto' }}>
-      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Button startIcon={<BackIcon />} onClick={() => navigate(-1)} sx={{ textTransform: 'none' }}>
-          Back
-        </Button>
-        <Typography variant="h5" fontWeight={700}>
-          Help & Support
-        </Typography>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidthNarrow, mx: 'auto' }}>
+      <PageHeader title="Help & Support" backPath={true} />
 
       {/* Video Tutorials */}
       <Card sx={{ mb: 2 }}>

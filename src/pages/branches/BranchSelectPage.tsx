@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  Card,
   CardActionArea,
   CardContent,
   Chip,
@@ -29,7 +28,11 @@ import type { GymBranch } from '@/api/branch';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router';
 import { saveToken } from '@/api/client';
-import { Colors } from '@/theme';
+import { Colors, Layout } from '@/theme';
+import PageHeader from '@/components/PageHeader';
+import EmptyState from '@/components/EmptyState';
+import StripedCard from '@/components/StripedCard';
+import StatusChip from '@/components/StatusChip';
 
 export default function BranchSelectPage() {
   const navigate = useNavigate();
@@ -113,25 +116,16 @@ export default function BranchSelectPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 900, mx: 'auto' }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h5" fontWeight={700}>
-            Gym Branches
-          </Typography>
-          <Typography variant="body2" color="text.secondary" mt={0.25}>
-            Select a branch to manage
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setDialogOpen(true)}
-        >
-          Add Branch
-        </Button>
-      </Box>
+    <Box sx={{ maxWidth: Layout.pageMaxWidth, mx: 'auto' }}>
+      <PageHeader
+        title="Gym Branches"
+        subtitle="Select a branch to manage"
+        action={
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
+            Add Branch
+          </Button>
+        }
+      />
 
       {/* Branch list */}
       {loading ? (
@@ -143,13 +137,7 @@ export default function BranchSelectPage() {
           ))}
         </Grid>
       ) : branches.length === 0 ? (
-        <Card>
-          <CardContent sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h6" color="text.secondary">
-              No branches found
-            </Typography>
-          </CardContent>
-        </Card>
+        <EmptyState title="No branches found" />
       ) : (
         <Grid container spacing={2}>
           {branches.map((branch) => {
@@ -159,25 +147,11 @@ export default function BranchSelectPage() {
 
             return (
               <Grid key={branch._id} size={{ xs: 12, sm: 6 }}>
-                <Card
-                  sx={{
-                    display: 'flex',
-                    overflow: 'hidden',
-                    height: '100%',
-                    ...(isCurrent && {
-                      border: '2px solid',
-                      borderColor: Colors.primary,
-                    }),
-                  }}
+                <StripedCard
+                  stripeColor={isCurrent ? Colors.primary : expired ? Colors.status.expired : '#E0E0E0'}
+                  sx={isCurrent ? { border: '2px solid', borderColor: Colors.primary } : undefined}
                 >
-                  <Box
-                    sx={{
-                      width: 4,
-                      bgcolor: isCurrent ? Colors.primary : expired ? Colors.status.expired : '#E0E0E0',
-                      flexShrink: 0,
-                    }}
-                  />
-                  <Box sx={{ flex: 1, display: 'flex' }}>
+                  <Box sx={{ display: 'flex', flex: 1 }}>
                     <CardActionArea
                       onClick={() => handleSwitch(branch)}
                       disabled={isCurrent || !!switching}
@@ -209,17 +183,7 @@ export default function BranchSelectPage() {
                           )}
                         </Box>
                         {expired && (
-                          <Chip
-                            label="Subscription Expired"
-                            size="small"
-                            sx={{
-                              bgcolor: '#ffebee',
-                              color: Colors.status.expired,
-                              fontWeight: 600,
-                              fontSize: 11,
-                              height: 22,
-                            }}
-                          />
+                          <StatusChip label="Subscription Expired" color={Colors.status.expired} />
                         )}
                       </CardContent>
                     </CardActionArea>
@@ -235,7 +199,7 @@ export default function BranchSelectPage() {
                       </Box>
                     )}
                   </Box>
-                </Card>
+                </StripedCard>
               </Grid>
             );
           })}
